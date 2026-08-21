@@ -168,7 +168,7 @@
   .ct-highlight-frame{ position:absolute; top:0; right:0; bottom:0; width:19.23%; background:linear-gradient(165deg,#6C70F0 0%,var(--accent) 46%,#3F43C4 100%); z-index:0; pointer-events:none; }
   .ct-highlight-frame::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,.16),transparent 40%); }
   .ct-head-logo{ justify-content:center !important; align-items:center !important; width:100%; padding-top:22px !important; }
-  .ct-head-logo img{ height:22px; width:auto; filter:brightness(0) invert(1); position:relative; z-index:1; }
+  .ct-head-logo img{ height:16px; width:auto; filter:brightness(0) invert(1); position:relative; z-index:1; }
   .ct-mark{ width:18px; height:18px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; margin-top:1px; }
   .ct-mark svg{ width:11px; height:11px; }
   .ct-mark.m-dash{ background:var(--surface-alt); color:var(--muted); opacity:.75; }
@@ -207,22 +207,47 @@
   .vis-code-line.muted{ color:var(--muted); }
   .vis-code-method{ font-weight:700; color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:5px; font-size:10.5px; flex:none; }
 
+  /* step-visual content animation, plays once the step scrolls in-view */
+  .vis-icon, .vis-bars, .vis-chip-row, .vis-key-name, .vis-key-value, .vis-code{ opacity:0; }
+  .step.in-view .vis-icon{ animation:fadeUp .45s ease .3s both; }
+  .step.in-view .vis-bars{ animation:fadeUp .45s ease .38s both; }
+  .step.in-view .vis-bars span{ transform-origin:bottom; animation:growBar .5s cubic-bezier(.34,1.56,.64,1) .42s both; }
+  .step.in-view .vis-chip-row{ animation:fadeUp .45s ease .46s both; }
+  .step.in-view .vis-chip{ animation:popIn .4s ease both; }
+  .step.in-view .vis-chip:nth-child(2){ animation-delay:.52s; }
+  .step.in-view .vis-chip:first-child{ animation-delay:.46s; }
+  .step.in-view .vis-key-name{ animation:fadeUp .45s ease .38s both; }
+  .step.in-view .vis-key-value{ animation:fadeUp .45s ease .48s both; }
+  .step.in-view .vis-code{ animation:fadeUp .45s ease .38s both; }
+  .vis-code-line{ opacity:0; }
+  .step.in-view .vis-code-line{ animation:fadeUp .4s ease both; }
+  .step.in-view .vis-code-line:nth-child(1){ animation-delay:.46s; }
+  .step.in-view .vis-code-line:nth-child(2){ animation-delay:.56s; }
+
   /* ---------- SOLUTION DARK ---------- */
   .solution{ padding:96px 0; }
-  .sol-frame{ max-width:1000px; margin:0 auto; background:#fff; border-radius:26px; padding:10px; border:1px solid var(--line); box-shadow:0 30px 90px -20px rgba(26,22,21,0.18), 0 8px 24px -6px rgba(26,22,21,0.08); }
+  .sol-frame{ position:relative; max-width:1000px; margin:0 auto; background:#fff; border-radius:26px; padding:10px; border:1px solid var(--line); box-shadow:0 30px 90px -20px rgba(26,22,21,0.18), 0 8px 24px -6px rgba(26,22,21,0.08); opacity:0; transform:translateY(20px) scale(.98); transition:opacity .7s ease, transform .7s cubic-bezier(.22,1,.36,1); }
+  .sol-frame.in-view{ opacity:1; transform:translateY(0) scale(1); }
   .sol-bar{ display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--surface-alt); }
-  .sol-shot{ display:block; width:100%; height:auto; border-radius:0 0 16px 16px; }
+  .sol-live{ display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-weight:600; color:#15803D; }
+  .sol-live::before{ content:""; width:7px; height:7px; border-radius:50%; background:#22C55E; animation:livePulse 1.8s ease-in-out infinite; }
+  .sol-shot-wrap{ position:relative; overflow:hidden; border-radius:0 0 16px 16px; }
+  .sol-shot{ display:block; width:100%; height:auto; border-radius:0 0 16px 16px; transition:transform .5s ease; }
+  .sol-frame:hover .sol-shot{ transform:scale(1.015); }
+  .sol-shot-wrap::after{ content:""; position:absolute; inset:0; background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,.35) 50%, transparent 60%); background-size:220% 100%; background-position:160% 0; pointer-events:none; }
+  .sol-frame.in-view .sol-shot-wrap::after{ animation:shimmerSweep 1.8s ease-in-out .3s 1; }
 
   /* ---------- SERVICES ---------- */
   .services{ background:var(--surface); padding:96px 0; }
-  .svc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-  .svc-card{ position:relative; background:#fff; border:1px solid var(--line); border-radius:22px; padding:32px; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-  .svc-card:hover{ transform:translateY(-6px); box-shadow:0 20px 40px -18px rgba(26,22,21,0.2); border-color:var(--accent); }
-  .price-badge{ position:absolute; top:-13px; right:28px; background:var(--accent); color:#fff; font-size:11.5px; font-weight:700; padding:5px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(91,95,234,.35); }
-  .svc-card.dark{ background:var(--ink); border-color:var(--ink); color:#fff; }
-  .svc-card.dark:hover{ border-color:#8B93FF; box-shadow:0 20px 40px -18px rgba(0,0,0,0.4); }
-  .svc-tag{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:12px; }
-  .svc-card.dark .svc-tag{ color:#A39D9A; }
+  .svc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .svc-card{ position:relative; background:#fff; border:1px solid var(--line); border-radius:28px; padding:34px; box-shadow:0 20px 48px -32px rgba(26,22,21,0.25); opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .5s cubic-bezier(.22,1,.36,1), box-shadow .25s ease; }
+  .svc-card.in-view{ opacity:1; transform:translateY(0); }
+  .svc-card:hover{ transform:translateY(-8px); box-shadow:0 26px 52px -20px rgba(26,22,21,0.22); }
+  .price-badge{ position:absolute; top:-14px; right:30px; display:inline-flex; align-items:center; gap:5px; background:linear-gradient(135deg,#6C70F0,var(--accent) 55%,#3F43C4); color:#fff; font-size:11.5px; font-weight:700; padding:6px 14px; border-radius:999px; box-shadow:0 6px 16px -4px rgba(91,95,234,.55); }
+  .svc-card.dark{ background:radial-gradient(120% 140% at 100% 0%, #23201F 0%, var(--ink) 55%), var(--ink); border-color:#2A2624; color:#fff; }
+  .svc-card.dark:hover{ box-shadow:0 26px 52px -18px rgba(0,0,0,0.5); }
+  .svc-tag{ display:inline-block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--accent); background:var(--accent-soft); padding:5px 12px; border-radius:999px; margin-bottom:16px; }
+  .svc-card.dark .svc-tag{ color:#B9BCFF; background:rgba(139,147,255,.16); }
   .svc-card h3{ font-size:23px; margin-bottom:10px; }
   .svc-desc{ font-size:14.5px; color:var(--muted); line-height:1.55; margin-bottom:20px; }
   .svc-card.dark .svc-desc{ color:#C9C4C1; }
@@ -238,9 +263,10 @@
   .svc-list li:first-child{ border-top:none; }
   .svc-list li{ transition:padding-left .18s ease; }
   .svc-list li:hover{ padding-left:4px; }
-  .svc-list li::before{ content:"✓"; color:var(--accent); font-weight:700; flex:none; }
-  .svc-card.dark .svc-list li::before{ color:#8B93FF; }
-  .price-value{ font-size:34px; font-weight:800; line-height:1.1; margin-bottom:4px; }
+  .svc-list li::before{ content:"✓"; display:flex; align-items:center; justify-content:center; width:18px; height:18px; margin-top:1.5px; border-radius:50%; font-size:10px; background:var(--accent-soft); color:var(--accent); font-weight:800; flex:none; }
+  .svc-card.dark .svc-list li::before{ background:rgba(139,147,255,.16); color:#8B93FF; }
+  .price-value{ font-size:36px; font-weight:800; line-height:1.1; margin-bottom:4px; background:linear-gradient(90deg,var(--ink),var(--ink-soft)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
+  .svc-card.dark .price-value{ background:linear-gradient(90deg,#fff,#C9C4C1); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
   .price-sub{ font-size:13px; color:var(--muted); margin-bottom:22px; }
   .svc-card.dark .price-sub{ color:#9C9591; }
 
@@ -427,7 +453,6 @@
 
   <section class="marquee-band">
     <div class="marquee-row">
-      <p class="marquee-label">Berbagai model AI dengan routing otomatis.</p>
       <div class="marquee-track">
         <span class="marquee-pill"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M11.248 18.25q-.825 0-1.568-.314a4.3 4.3 0 0 1-1.32-.874 4 4 0 0 1-1.304.214 4 4 0 0 1-2.046-.544 4.27 4.27 0 0 1-1.518-1.485 4 4 0 0 1-.56-2.095q0-.48.131-1.04A4.4 4.4 0 0 1 2.04 10.71a4.07 4.07 0 0 1 .017-3.4 4.2 4.2 0 0 1 1.056-1.418 3.8 3.8 0 0 1 1.6-.842 3.9 3.9 0 0 1 .76-1.683q.593-.759 1.451-1.188a4.04 4.04 0 0 1 1.832-.429q.825 0 1.567.313.742.314 1.32.875a4 4 0 0 1 1.304-.215q1.106 0 2.046.545a4.14 4.14 0 0 1 1.501 1.485q.578.941.578 2.095 0 .48-.132 1.04.66.61 1.023 1.419.363.792.363 1.666 0 .892-.38 1.717a4.3 4.3 0 0 1-1.072 1.435 3.8 3.8 0 0 1-1.584.825 3.8 3.8 0 0 1-.775 1.683 4.06 4.06 0 0 1-1.436 1.188 4.04 4.04 0 0 1-1.832.429m-4.076-2.062q.825 0 1.435-.347l3.103-1.782a.36.36 0 0 0 .164-.313v-1.42L7.881 14.62a.67.67 0 0 1-.726 0l-3.118-1.798a.5.5 0 0 1-.017.115v.198q0 .841.396 1.551.413.693 1.139 1.089a3.2 3.2 0 0 0 1.617.412m.165-2.69a.4.4 0 0 0 .181.05q.083 0 .165-.05l1.238-.71-3.977-2.31a.7.7 0 0 1-.363-.643v-3.58q-.825.362-1.32 1.122a2.9 2.9 0 0 0-.495 1.65q0 .809.413 1.55.412.743 1.072 1.123zm3.91 3.663q.875 0 1.585-.396a2.96 2.96 0 0 0 1.534-2.64v-3.564a.32.32 0 0 0-.165-.297l-1.254-.726v4.604a.7.7 0 0 1-.363.643l-3.119 1.799a3 3 0 0 0 1.783.577m.627-6.039V8.878L10.01 7.822 8.129 8.878v2.244l1.881 1.056zM7.057 5.859a.7.7 0 0 1 .363-.644l3.119-1.798a3 3 0 0 0-1.782-.578q-.874 0-1.584.396A2.96 2.96 0 0 0 6.05 4.324a3.07 3.07 0 0 0-.396 1.551v3.547q0 .199.165.314l1.237.726zm8.383 7.887q.825-.364 1.303-1.123.495-.758.495-1.65a3.15 3.15 0 0 0-.412-1.55q-.413-.743-1.073-1.123l-3.086-1.782q-.099-.065-.181-.049a.3.3 0 0 0-.165.05l-1.238.692 3.993 2.327a.6.6 0 0 1 .264.264.64.64 0 0 1 .1.363zm-3.317-8.382a.63.63 0 0 1 .726 0l3.135 1.831v-.297q0-.792-.396-1.501a2.86 2.86 0 0 0-1.105-1.155q-.71-.43-1.65-.43-.825 0-1.436.347L8.294 5.941a.36.36 0 0 0-.165.314v1.418z"/></svg>OpenAI</span>
         <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>Google Gemini</span>
@@ -559,9 +584,11 @@
         <div class="sol-bar">
           <div class="mock-dots"><span></span><span></span><span></span></div>
           <div class="mock-url">dashboard.conextrouter.id</div>
-          <div style="width:60px"></div>
+          <span class="sol-live">Live</span>
         </div>
-        <img class="sol-shot" src="images/dashboard-preview.jpg" alt="Tampilan dashboard ConextRouter — saldo, pemakaian, dan API key dalam satu layar" loading="lazy">
+        <div class="sol-shot-wrap">
+          <img class="sol-shot" src="images/dashboard-preview.jpg" alt="Tampilan dashboard ConextRouter — saldo, pemakaian, dan API key dalam satu layar" loading="lazy">
+        </div>
       </div>
     </div>
   </section>
@@ -675,8 +702,8 @@
           </ul>
           <a href="#" class="btn btn-dark">Buat Akun Gratis</a>
         </div>
-        <div class="svc-card dark">
-          <span class="price-badge">Rekomendasi</span>
+        <div class="svc-card dark" style="transition-delay:.1s;">
+          <span class="price-badge"><svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2l1.8 5.2L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.8z"/></svg>Rekomendasi</span>
           <div class="svc-tag">Enterprise</div>
           <h3>Untuk Tim &amp; Perusahaan</h3>
           <div class="price-value">Custom</div>
@@ -780,10 +807,10 @@
 
 <script>
 (function(){
-  var steps = document.querySelectorAll('.step');
-  if(!steps.length) return;
+  var targets = document.querySelectorAll('.step, .sol-frame, .svc-card');
+  if(!targets.length) return;
   if(!('IntersectionObserver' in window)){
-    steps.forEach(function(s){ s.classList.add('in-view'); });
+    targets.forEach(function(s){ s.classList.add('in-view'); });
     return;
   }
   var io = new IntersectionObserver(function(entries){
@@ -794,7 +821,7 @@
       }
     });
   }, { threshold: 0.2 });
-  steps.forEach(function(s){ io.observe(s); });
+  targets.forEach(function(s){ io.observe(s); });
 })();
 
 (function(){
