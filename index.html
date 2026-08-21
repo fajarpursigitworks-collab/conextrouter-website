@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ConextRouter — Satu API, Semua Model AI</title>
+<meta name="description" content="ConextRouter adalah gateway API AI dari Ralali, didukung Alibaba Cloud. Satu API key, semua model AI.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1A1615;
+    --ink-soft:#453F3D;
+    --muted:#757170;
+    --line:#E3E1E1;
+    --surface:#F9F8F8;
+    --surface-alt:#F4F1EE;
+    --card:#FFFFFF;
+    --accent:#5B5FEA;
+    --accent-soft:#5B5FEA14;
+    --alibaba:#FF6A2B;
+    --font: 'Plus Jakarta Sans', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+  body{ margin:0; font-family:var(--font); color:var(--ink); background:var(--card); line-height:1.5; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4{ font-family:var(--font); font-weight:700; margin:0; letter-spacing:-0.01em; }
+  p{ margin:0; }
+  a{ text-decoration:none; color:inherit; }
+  img{ display:block; max-width:100%; }
+  button{ font-family:inherit; cursor:pointer; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
+  .wrap{ max-width:1160px; margin:0 auto; padding:0 24px; }
+
+  .btn{ display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:999px; font-weight:600; font-size:14.5px; border:1px solid transparent; transition:transform .15s ease, background .2s ease; white-space:nowrap; }
+  .btn:active{ transform:scale(0.97); }
+  .btn-dark{ background:var(--ink); color:#fff; }
+  .btn-dark:hover{ background:var(--ink-soft); transform:translateY(-2px); }
+  .btn-light{ background:#fff; color:var(--ink); border-color:var(--line); }
+  .btn-light:hover{ background:var(--surface-alt); transform:translateY(-2px); }
+  .btn-ghost{ background:transparent; color:var(--ink); }
+  .btn-ghost:hover{ background:rgba(0,0,0,0.05); }
+
+  /* ---------- NAV ---------- */
+  .nav-float{ position:fixed; top:16px; left:16px; right:16px; z-index:50; display:flex; justify-content:center; }
+  .nav-inner{ width:100%; max-width:1160px; height:64px; border-radius:999px; background:rgba(255,255,255,0.65); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.8); box-shadow:0 4px 24px -4px rgba(26,22,21,0.1); display:flex; align-items:center; justify-content:space-between; padding:0 10px 0 16px; }
+  .brand{ display:flex; align-items:center; gap:9px; font-weight:700; font-size:16.5px; }
+  .brand .mark{ width:32px; height:32px; border-radius:9px; background:var(--ink); display:flex; align-items:center; justify-content:center; }
+  .nav-links{ display:flex; gap:6px; }
+  .nav-links a{ position:relative; font-weight:500; font-size:14px; color:var(--ink); padding:9px 16px; border-radius:999px; transition:background .15s ease; }
+  .nav-links a:hover{ background:rgba(0,0,0,0.05); }
+  .nav-links a::after{ content:""; position:absolute; left:16px; right:16px; bottom:5px; height:1.5px; background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform .25s ease; }
+  .nav-links a:hover::after{ transform:scaleX(1); }
+  .nav-cta{ display:flex; align-items:center; gap:6px; }
+  .nav-toggle{ display:none; background:none; border:none; width:38px; height:38px; align-items:center; justify-content:center; border-radius:999px; }
+
+  /* ---------- HERO ---------- */
+  .hero{ position:relative; overflow:hidden; padding-top:120px; }
+  .sky{ position:absolute; inset:0; z-index:0; background:linear-gradient(180deg, #AFCFEE 0%, #C3DCF0 20%, #DCEAF2 38%, #E9EEDB 58%, #F1E7CE 76%, #ECDCB6 100%); }
+  .cloud{ position:absolute; border-radius:50%; background:rgba(255,255,255,0.65); filter:blur(30px); z-index:1; }
+  .cloud-a{ width:420px; height:160px; top:60px; left:-80px; }
+  .cloud-b{ width:340px; height:140px; top:180px; right:-60px; }
+  .cloud-c{ width:280px; height:110px; top:340px; left:20%; opacity:0.7; }
+  .hero-content{ position:relative; z-index:2; text-align:center; padding-bottom:56px; }
+  .eyebrow{ display:inline-flex; align-items:center; gap:8px; padding:7px 16px; border-radius:999px; border:1px solid rgba(255,255,255,0.6); background:rgba(255,255,255,0.55); backdrop-filter:blur(6px); font-size:13px; font-weight:600; color:var(--ink-soft); margin-bottom:28px; }
+  .eyebrow-logo{ height:13px; width:auto; display:block; }
+  .hero h1{ font-size:clamp(40px,7vw,80px); line-height:1.03; max-width:760px; margin:0 auto 22px; color:var(--ink); }
+  .hero p.lead{ font-size:18px; color:var(--muted); max-width:480px; margin:0 auto 34px; line-height:1.55; }
+  .hero-ctas{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+  .hero-note{ font-size:13.5px; color:var(--muted); }
+
+  /* dashboard mock */
+  .mock-wrap{ position:relative; z-index:2; padding:0 16px 0; }
+  .mock-outer{ max-width:1000px; margin:0 auto; border-radius:26px 26px 0 0; border:3px solid rgba(255,255,255,0.85); border-bottom:none; background:rgba(255,255,255,0.9); padding:10px 10px 0; box-shadow:0 40px 100px -16px rgba(26,22,21,0.22), 0 8px 24px -4px rgba(26,22,21,0.1); }
+  .mock-inner{ border-radius:18px 18px 0 0; overflow:hidden; background:#fff; }
+  @keyframes growBar{ from{ transform:scaleY(0); } to{ transform:scaleY(1); } }
+  @keyframes popIn{ from{ opacity:0; transform:scale(.96); } to{ opacity:1; transform:scale(1); } }
+  @keyframes fadeUp{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes shimmerSweep{ 0%{ background-position:160% 0; } 100%{ background-position:-60% 0; } }
+  @keyframes livePulse{ 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:.4; transform:scale(.7); } }
+  .dash-balance{ animation:popIn .5s ease both; }
+  .dash-balance::after{ content:""; position:absolute; inset:0; background:linear-gradient(115deg, transparent 42%, rgba(255,255,255,.28) 50%, transparent 58%); background-size:220% 100%; animation:shimmerSweep 3.2s ease-in-out .6s infinite; pointer-events:none; }
+  .dash-balance .mock-bars div{ transform-origin:bottom; animation:growBar .6s cubic-bezier(.34,1.56,.64,1) both; }
+  .dash-balance .mock-bars div:nth-child(1){ animation-delay:.3s; }
+  .dash-balance .mock-bars div:nth-child(2){ animation-delay:.35s; }
+  .dash-balance .mock-bars div:nth-child(3){ animation-delay:.4s; }
+  .dash-balance .mock-bars div:nth-child(4){ animation-delay:.45s; }
+  .dash-balance .mock-bars div:nth-child(5){ animation-delay:.5s; }
+  .dash-balance .mock-bars div:nth-child(6){ animation-delay:.55s; }
+  .dash-balance .mock-bars div:nth-child(7){ animation-delay:.6s; }
+  .dash-stat-chip{ animation:fadeUp .5s ease both; }
+  .dash-stats-row .dash-stat-chip:nth-child(1){ animation-delay:.75s; }
+  .dash-stats-row .dash-stat-chip:nth-child(2){ animation-delay:.85s; }
+  .mock-bar{ display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--surface-alt); }
+  .mock-dots{ display:flex; gap:6px; }
+  .mock-dots span{ width:9px; height:9px; border-radius:50%; background:var(--line); }
+  .mock-url{ font-family:var(--mono); font-size:11.5px; color:var(--muted); background:var(--surface); padding:5px 14px; border-radius:8px; }
+  .mock-bars{ display:flex; align-items:flex-end; gap:6px; height:60px; }
+  .mock-bars div{ flex:1; background:var(--accent); border-radius:4px 4px 1px 1px; opacity:0.85; }
+  .mock-key-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-top:1px solid var(--surface-alt); }
+  .mock-key-row:first-of-type{ border-top:none; }
+  .mock-key-row .k{ font-family:var(--mono); font-size:12px; color:var(--ink-soft); }
+  .mock-tag{ font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; background:#DCFCE7; color:#15803D; }
+
+  /* ---------- REAL DASHBOARD SHELL (hero + solution) ---------- */
+  .dash-shell{ display:flex; min-height:0; }
+  .dash-side{ width:56px; flex:none; background:var(--surface); border-right:1px solid var(--surface-alt); display:flex; flex-direction:column; align-items:center; padding:16px 0; gap:6px; }
+  .dash-side .side-logo{ width:26px; height:26px; border-radius:8px; background:var(--ink); margin-bottom:16px; flex:none; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:800; font-size:12px; }
+  .dash-side .side-icon{ width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:var(--muted); transition:background .18s ease, color .18s ease, transform .18s ease; }
+  .dash-side .side-icon svg{ width:16px; height:16px; }
+  .dash-side .side-icon.active{ background:#fff; color:var(--accent); box-shadow:0 1px 4px rgba(26,22,21,0.12); }
+  .dash-side .side-icon:not(.active):hover{ background:rgba(255,255,255,0.7); color:var(--ink-soft); transform:translateY(-1px); }
+  .dash-main{ flex:1; min-width:0; }
+  .dash-topbar{ display:flex; align-items:center; justify-content:space-between; padding:13px 20px; border-bottom:1px solid var(--surface-alt); }
+  .dash-topbar .title{ font-size:14.5px; font-weight:700; }
+  .dash-topbar .right{ display:flex; align-items:center; gap:12px; }
+  .dash-bell{ color:var(--muted); transition:color .18s ease, transform .18s ease; }
+  .dash-bell:hover{ color:var(--accent); transform:rotate(-8deg); }
+  .dash-avatar{ width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--accent),#8B93FF); flex:none; display:flex; align-items:center; justify-content:center; overflow:hidden; transition:transform .18s ease; }
+  .dash-avatar:hover{ transform:scale(1.08); }
+  .dash-avatar svg{ width:62%; height:62%; }
+
+  /* simplified dashboard mock: balance card + stat chips + usage chart */
+  .dash-balance{ margin:20px 20px 0; padding:20px 22px; border-radius:16px; background:linear-gradient(135deg,var(--accent),#8B93FF); color:#fff; position:relative; overflow:hidden; transition:box-shadow .2s ease; }
+  .dash-balance:hover{ box-shadow:0 10px 28px -8px rgba(91,95,234,.5); }
+  .dash-balance::before{ content:""; position:absolute; top:-40%; right:-10%; width:180px; height:180px; background:radial-gradient(circle,rgba(255,255,255,.25),transparent 70%); border-radius:50%; }
+  .dash-balance .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:.05em; opacity:.85; margin-bottom:6px; position:relative; z-index:1; }
+  .dash-balance .val{ font-size:28px; font-weight:800; margin-bottom:12px; position:relative; z-index:1; }
+  .dash-balance .mock-bars{ height:34px; position:relative; z-index:1; }
+  .dash-balance .mock-bars div{ background:rgba(255,255,255,.55); }
+  .dash-stats-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 20px 20px; }
+  .dash-stat-chip{ background:var(--surface); border:1px solid var(--surface-alt); border-radius:12px; padding:12px 14px; transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+  .dash-stat-chip:hover{ transform:translateY(-3px); border-color:var(--accent); box-shadow:0 8px 18px -8px rgba(91,95,234,.35); }
+  .dash-stat-chip .lbl{ font-size:11px; color:var(--muted); font-weight:600; margin-bottom:4px; }
+  .dash-stat-chip .val{ font-size:16px; font-weight:800; }
+
+  /* ---------- MARQUEE ---------- */
+  .marquee-band{ background:#fff; padding:40px 0; overflow:hidden; }
+  .marquee-label{ text-align:center; font-size:12.5px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:16px; }
+  .marquee-track{ display:flex; gap:14px; width:max-content; animation:scroll 26s linear infinite; }
+  @keyframes scroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+  .marquee-pill{ display:flex; align-items:center; gap:9px; padding:9px 18px; background:#fff; border:1px solid var(--line); border-radius:999px; font-size:13px; font-weight:500; color:var(--ink-soft); white-space:nowrap; transition:transform .18s ease, border-color .18s ease, color .18s ease, box-shadow .18s ease; }
+  .marquee-pill:hover{ transform:translateY(-3px) scale(1.04); border-color:var(--accent); color:var(--accent); box-shadow:0 8px 18px -8px rgba(91,95,234,.35); }
+  .marquee-pill svg{ width:16px; height:16px; flex-shrink:0; color:var(--ink-soft); transition:color .18s ease; }
+  .marquee-pill:hover svg{ color:var(--accent); }
+
+  /* ---------- WHY (compare) ---------- */
+  .why{ padding:96px 0; }
+  .p-eyebrow{ font-size:12.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--accent); margin-bottom:14px; }
+  .compare-table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; margin-top:6px; }
+  .compare-table{ min-width:900px; background:#fff; border:1px solid var(--line); border-radius:20px; overflow:hidden; position:relative; box-shadow:0 40px 90px -46px rgba(26,22,21,.28); }
+  .ct-row{ display:grid; grid-template-columns:1.2fr repeat(4,1fr); }
+  .ct-row + .ct-row{ border-top:1px solid var(--surface-alt); }
+  .ct-cell{ padding:16px 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.45; display:flex; align-items:flex-start; gap:9px; transition:background .18s ease; }
+  .ct-icon{ width:26px; height:26px; border-radius:8px; background:var(--surface-alt); color:var(--ink-soft); display:flex; align-items:center; justify-content:center; flex:none; }
+  .ct-icon svg{ width:15px; height:15px; }
+  .ct-head{ border-top:none; }
+  .ct-head .ct-cell{ flex-direction:column; align-items:center; text-align:center; padding-top:22px; }
+  .ct-head-title{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); line-height:1.3; }
+  .ct-label{ font-weight:700; color:var(--ink); font-size:13px; align-items:center; }
+  .ct-label .ct-icon{ background:var(--accent-soft); color:var(--accent); }
+  .ct-row:not(.ct-head):hover .ct-cell:not(.ct-highlight){ background:var(--surface); }
+  .ct-highlight{ background:transparent; color:#fff; font-weight:500; position:relative; z-index:1; }
+  .ct-highlight-frame{ position:absolute; top:0; right:0; bottom:0; width:19.23%; background:linear-gradient(165deg,#6C70F0 0%,var(--accent) 46%,#3F43C4 100%); z-index:0; pointer-events:none; }
+  .ct-highlight-frame::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(255,255,255,.16),transparent 40%); }
+  .ct-head-logo{ justify-content:center !important; align-items:center !important; width:100%; padding-top:22px !important; }
+  .ct-head-logo img{ height:22px; width:auto; filter:brightness(0) invert(1); position:relative; z-index:1; }
+  .ct-mark{ width:18px; height:18px; border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center; margin-top:1px; }
+  .ct-mark svg{ width:11px; height:11px; }
+  .ct-mark.m-dash{ background:var(--surface-alt); color:var(--muted); opacity:.75; }
+  .ct-mark.m-check{ background:linear-gradient(135deg,#fff,#E7E8FF); color:var(--accent); box-shadow:0 2px 6px rgba(0,0,0,.15); }
+  .compare-note{ text-align:center; font-size:12.5px; color:var(--muted); margin-top:16px; }
+
+  /* ---------- HOW ---------- */
+  .how{ background:var(--surface); padding:96px 0; }
+  .how-head{ text-align:center; margin:0 auto 52px; }
+  .how-head .p-eyebrow{ text-align:center; }
+  .how-head h2{ font-size:clamp(14px,4.2vw,36px); margin-bottom:12px; white-space:nowrap; }
+  .how-head p{ color:var(--muted); font-size:16px; max-width:520px; margin:0 auto; }
+  .steps{ display:flex; align-items:stretch; gap:14px; }
+  .step{ flex:1; background:#fff; border:1px solid var(--line); border-radius:18px; padding:26px; opacity:0; transform:translateY(16px); transition:opacity .5s ease, transform .5s ease, border-color .2s ease, box-shadow .2s ease; }
+  .step.in-view{ opacity:1; transform:translateY(0); }
+  .step:hover{ transform:translateY(-6px); border-color:var(--accent); box-shadow:0 16px 32px -14px rgba(26,22,21,0.18); }
+  .step .circle{ width:38px; height:38px; border-radius:50%; background:var(--ink); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:15px; margin-bottom:14px; transition:background .2s ease, transform .2s ease; }
+  .step:hover .circle{ background:var(--accent); transform:scale(1.08); }
+  .step h4{ font-size:16.5px; margin-bottom:6px; }
+  .step p{ font-size:14px; color:var(--muted); }
+  .step-arrow{ flex:none; display:flex; align-items:center; justify-content:center; color:var(--line); font-size:20px; font-weight:700; }
+
+  /* step illustrations */
+  .step-visual{ margin-top:20px; padding-top:18px; border-top:1px solid var(--surface-alt); }
+  .vis-icon{ width:19px; height:19px; color:var(--muted); margin-bottom:14px; display:block; }
+  .vis-bars{ display:flex; gap:6px; margin-bottom:14px; }
+  .vis-bars span{ height:8px; border-radius:4px; background:var(--surface-alt); display:block; }
+  .vis-chip-row{ display:flex; gap:8px; }
+  .vis-chip{ width:34px; height:34px; border-radius:9px; background:var(--surface); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; }
+  .vis-chip svg{ width:16px; height:16px; }
+  .vis-key-name{ font-family:var(--mono); font-size:11px; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:9px 11px; margin-bottom:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .vis-key-value{ font-family:var(--mono); font-size:13px; color:var(--muted); letter-spacing:2px; background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:9px 11px; }
+  .vis-code{ background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-family:var(--mono); font-size:11.5px; color:var(--ink-soft); }
+  .vis-code-line{ display:flex; align-items:center; gap:8px; white-space:nowrap; }
+  .vis-code-line + .vis-code-line{ margin-top:8px; }
+  .vis-code-line.muted{ color:var(--muted); }
+  .vis-code-method{ font-weight:700; color:var(--accent); background:var(--accent-soft); padding:2px 7px; border-radius:5px; font-size:10.5px; flex:none; }
+
+  /* ---------- SOLUTION DARK ---------- */
+  .solution{ padding:96px 0; }
+  .sol-frame{ max-width:1000px; margin:0 auto; background:#fff; border-radius:26px; padding:10px; border:1px solid var(--line); box-shadow:0 30px 90px -20px rgba(26,22,21,0.18), 0 8px 24px -6px rgba(26,22,21,0.08); }
+  .sol-bar{ display:flex; align-items:center; justify-content:space-between; padding:12px 18px; border-bottom:1px solid var(--surface-alt); }
+  .sol-shot{ display:block; width:100%; height:auto; border-radius:0 0 16px 16px; }
+
+  /* ---------- SERVICES ---------- */
+  .services{ background:var(--surface); padding:96px 0; }
+  .svc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .svc-card{ position:relative; background:#fff; border:1px solid var(--line); border-radius:22px; padding:32px; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+  .svc-card:hover{ transform:translateY(-6px); box-shadow:0 20px 40px -18px rgba(26,22,21,0.2); border-color:var(--accent); }
+  .price-badge{ position:absolute; top:-13px; right:28px; background:var(--accent); color:#fff; font-size:11.5px; font-weight:700; padding:5px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(91,95,234,.35); }
+  .svc-card.dark{ background:var(--ink); border-color:var(--ink); color:#fff; }
+  .svc-card.dark:hover{ border-color:#8B93FF; box-shadow:0 20px 40px -18px rgba(0,0,0,0.4); }
+  .svc-tag{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); margin-bottom:12px; }
+  .svc-card.dark .svc-tag{ color:#A39D9A; }
+  .svc-card h3{ font-size:23px; margin-bottom:10px; }
+  .svc-desc{ font-size:14.5px; color:var(--muted); line-height:1.55; margin-bottom:20px; }
+  .svc-card.dark .svc-desc{ color:#C9C4C1; }
+  .svc-meta{ display:flex; gap:12px; margin-bottom:20px; }
+  .svc-meta-item{ flex:1; background:var(--surface-alt); border-radius:12px; padding:11px 14px; }
+  .svc-card.dark .svc-meta-item{ background:#252120; }
+  .svc-meta-lbl{ display:block; font-size:11px; color:var(--muted); margin-bottom:3px; }
+  .svc-card.dark .svc-meta-lbl{ color:#9C9591; }
+  .svc-meta-val{ display:block; font-size:14.5px; font-weight:700; }
+  .svc-list{ list-style:none; margin:0 0 26px; padding:0; }
+  .svc-list li{ display:flex; gap:10px; font-size:14.5px; padding:9px 0; border-top:1px solid var(--surface-alt); line-height:1.45; }
+  .svc-card.dark .svc-list li{ border-top:1px solid #33302E; }
+  .svc-list li:first-child{ border-top:none; }
+  .svc-list li{ transition:padding-left .18s ease; }
+  .svc-list li:hover{ padding-left:4px; }
+  .svc-list li::before{ content:"✓"; color:var(--accent); font-weight:700; flex:none; }
+  .svc-card.dark .svc-list li::before{ color:#8B93FF; }
+  .price-value{ font-size:34px; font-weight:800; line-height:1.1; margin-bottom:4px; }
+  .price-sub{ font-size:13px; color:var(--muted); margin-bottom:22px; }
+  .svc-card.dark .price-sub{ color:#9C9591; }
+
+  /* product detail rows */
+  .prod-row{ display:flex; align-items:center; gap:56px; margin-top:64px; }
+  .prod-row.rev{ flex-direction:row-reverse; }
+  .prod-text{ flex:1.05; }
+  .prod-text h3{ font-size:clamp(24px,2.6vw,30px); margin-bottom:14px; }
+  .prod-visual{ flex:1; }
+  .prod-card{ background:#fff; border:1px solid var(--line); border-radius:22px; padding:26px; transition:transform .2s ease, box-shadow .2s ease; }
+  .prod-card:hover{ transform:translateY(-5px); box-shadow:0 20px 44px -20px rgba(26,22,21,0.22); }
+  .prod-card.dark{ background:#151312; border-color:#2A2624; }
+  .prod-card.dark:hover{ box-shadow:0 20px 44px -20px rgba(0,0,0,0.5); }
+  .pc-row{ display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-top:1px solid var(--surface-alt); }
+  .prod-card.dark .pc-row{ border-top:1px solid #2A2624; }
+  .pc-row:first-child{ border-top:none; }
+  .pc-lbl{ font-size:12px; color:var(--muted); font-weight:600; }
+  .prod-card.dark .pc-lbl{ color:#9C9591; }
+  .pc-val{ font-size:14.5px; font-weight:700; }
+  .prod-card.dark .pc-val{ color:#fff; }
+  .pc-big{ font-size:27px; font-weight:800; margin:4px 0 16px; }
+  .prod-card.dark .pc-big{ color:#fff; }
+  .team-avatars{ display:flex; gap:8px; margin:0 0 4px; }
+  .team-avatar{ width:32px; height:32px; border-radius:50%; background:#252120; border:1.5px solid #33302E; color:#C9C4C1; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; transition:transform .18s ease, border-color .18s ease; }
+  .team-avatar:hover{ transform:translateY(-3px); border-color:#8B93FF; color:#fff; }
+  .route-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 14px; border-radius:12px; background:var(--surface); margin-bottom:8px; transition:transform .18s ease, background .18s ease; }
+  .route-row:hover{ transform:translateX(4px); background:var(--accent-soft); }
+  .route-row .task{ font-size:13px; color:var(--ink-soft); }
+  .route-model{ font-family:var(--mono); font-weight:700; font-size:11.5px; color:var(--accent); background:var(--accent-soft); padding:5px 10px; border-radius:999px; flex:none; white-space:nowrap; }
+
+  /* pricing */
+  .pricing{ background:#fff; padding:96px 0; scroll-margin-top:80px; }
+  .price-head{ text-align:center; margin:0 auto 40px; }
+  .price-head .p-eyebrow{ text-align:center; }
+  .price-head h2{ font-size:clamp(15px,4.3vw,36px); margin-bottom:12px; white-space:nowrap; }
+  .price-head p{ color:var(--muted); font-size:16px; max-width:520px; margin:0 auto; }
+
+  /* ---------- FAQ ---------- */
+  .faq{ padding:96px 0; }
+  .faq-grid{ display:grid; grid-template-columns:0.9fr 1.4fr; gap:48px; }
+  .faq-grid h2{ font-size:clamp(20px,4vw,34px); margin-bottom:12px; white-space:nowrap; }
+  .faq-grid > div:first-child p{ color:var(--muted); font-size:15.5px; }
+  details{ border-bottom:1px solid var(--line); padding:18px 0; }
+  summary{ cursor:pointer; font-weight:600; font-size:15.5px; display:flex; justify-content:space-between; align-items:center; list-style:none; transition:color .18s ease; }
+  summary:hover{ color:var(--accent); }
+  summary::-webkit-details-marker{ display:none; }
+  summary .chev{ transition:transform .2s ease; flex:none; color:var(--muted); }
+  summary:hover .chev{ color:var(--accent); }
+  details[open] summary .chev{ transform:rotate(180deg); }
+  details p{ margin-top:12px; font-size:14.5px; color:var(--muted); line-height:1.6; }
+
+  /* ---------- FINAL CTA ---------- */
+  .final{ padding:0 0 96px; }
+  .final-band{ position:relative; overflow:hidden; border-radius:28px; text-align:center; padding:80px 32px; background:linear-gradient(160deg,#A7CBF2 0%,#9FC3E6 40%,#C5DCF0 100%); }
+  .final-band .cloud{ background:rgba(255,255,255,0.5); }
+  .final-inner{ position:relative; z-index:2; }
+  .final h2{ font-size:clamp(12px,4.6vw,44px); margin-bottom:14px; color:var(--ink); white-space:nowrap; }
+  .final p{ font-size:16px; color:var(--ink-soft); max-width:460px; margin:0 auto 28px; }
+  .final .hero-ctas{ margin-bottom:0; }
+
+  /* ---------- FOOTER ---------- */
+  footer{ background:var(--ink); color:#fff; padding:56px 0 28px; }
+  footer .brand img{ filter:brightness(0) invert(1); }
+  .foot-grid{ display:grid; grid-template-columns:1.3fr repeat(3,1fr); gap:32px; margin-bottom:40px; }
+  .foot-brand p{ color:#9C9591; font-size:13.5px; margin-top:12px; max-width:240px; }
+  .foot-col h5{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#9C9591; margin-bottom:14px; }
+  .foot-col ul{ list-style:none; margin:0; padding:0; }
+  .foot-col ul li{ margin-bottom:10px; }
+  .foot-col ul li a{ font-size:14px; color:#C9C4C1; transition:color .15s ease, padding-left .15s ease; }
+  .foot-col ul li a:hover{ color:#fff; padding-left:3px; }
+  .foot-bottom{ display:flex; justify-content:space-between; align-items:center; padding-top:24px; border-top:1px solid #2A2624; flex-wrap:wrap; gap:10px; }
+  .foot-bottom p{ font-size:12.5px; color:#9C9591; }
+  .powered-badge{ display:inline-flex; align-items:center; gap:14px; }
+  .powered-badge span{ font-size:12.5px; color:#8B8581; }
+  .powered-logo{ display:block; width:auto; }
+  .powered-logo.ralali{ height:28px; }
+  .powered-logo.alibaba{ height:17px; }
+  .powered-divider{ width:1px; height:22px; background:#3A3532; }
+
+  @media (max-width:900px){
+    .svc-grid{ grid-template-columns:1fr; }
+    .steps{ flex-direction:column; }
+    .step-arrow{ transform:rotate(90deg); margin:-4px 0; }
+    .faq-grid{ grid-template-columns:1fr; }
+    .foot-grid{ grid-template-columns:1fr 1fr; }
+    .prod-row, .prod-row.rev{ flex-direction:column; }
+  }
+  @media (max-width:640px){
+    .wrap{ padding:0 18px; }
+    .nav-links{ display:none; }
+    .nav-toggle{ display:flex; }
+    .nav-cta .btn-ghost{ display:none; }
+    .foot-grid{ grid-template-columns:1fr; gap:28px; }
+    .why, .how, .solution, .services, .pricing, .faq{ padding:64px 0; }
+    .svc-meta{ flex-direction:column; }
+    .dash-side{ width:44px; }
+    .dash-side .side-icon{ width:28px; height:28px; }
+    .dash-stats-row{ grid-template-columns:1fr; }
+    .final-band{ padding:56px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-float">
+  <div class="nav-inner wrap" style="padding-left:16px;padding-right:10px;">
+    <a href="#top" class="brand">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNDY3IDE2OS4yMSI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjYuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS40IEJ1aWxkIDEwOSkgIC0tPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuc3QwIHsKICAgICAgICBmaWxsOiAjMTc1MmVkOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04ODkuNTksMTY0Ljk4bC0zNC43OS0uMjUtMjguMTMtNTYuNzVoLTIzLjQ4bC4wNSw1My40MmMwLDEuMTctMi4zMiwzLjUtMy41NCwzLjVsLTMzLjY2LS4wMy0xLjI1LTEwLjc5LjA1LTE0OS44NSw3Ni40NC4yMmM5LjU1LjAzLDE4LjU3LDMuNDMsMjYuODgsNi45OSw5LjM5LDUuMDcsMTYuMjQsMTEuOTksMjAuNjksMjEuNzEsMTAuMywyNi4xMSwzLjE4LDU3LjI5LTIzLjM2LDY5LjA5bDMyLjA0LDYxLjZjLTEuOTEuNDktNS4zOCwxLjE2LTcuOTUsMS4xNGgwWk04NTMuOTcsNTYuODVjLjU3LTE0LjI1LTEwLjMzLTIzLjIzLTIzLjQxLTIzLjE4bC0yNy4zNS4xdjQ3LjEzbDMwLjkyLS4yOGMxMi40NS0uMTEsMjAuNzctMTEuMzYsMTkuODMtMjMuNzZoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIwLjk5LDEzMC41M2MtMTEuMTksMzMuNDQtNDcuOTIsNDMuMDUtNzkuNzIsMzQuMTEtMzYuOTgtMTAuMzktNDYuOTMtNTIuOTctMzYuMjgtODYuNzUsMTEuMzYtMzYuMDYsNTIuNDUtNDYuNDUsODQuODEtMzQuMTIsMzMuOSwxMi45Miw0MS45OCw1NC41LDMxLjE4LDg2Ljc1aC4wMVpNOTg0LjAxLDgyLjk1Yy0zLjQ4LTEwLjAyLTExLjI5LTE1LjU0LTIwLjk3LTE1LjQ4cy0xNi45Niw1LjQtMjAuNDcsMTVjLTguMTQsMjIuMjUtMy4zMSw1NywyMC40OCw1Ni44NiwyNC40Ni0uMTQsMjguNy0zNC4xMiwyMC45Ni01Ni4zOGgwWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTMuODgsNDEuNjNsLS4wNCwxMjIuODMtMzcuMDEuNDktMS4wNS0xOS44OWMtOC4xMiwxNi41NC0yMS41OCwyMi45My0zOC4yOSwyMi42NS0yNi44Ni0uNDQtMzkuMTctMTguMzUtNDAuMDMtNDQuNTlsLS4wNS04MS4zMywzNy4xMy0uMTIuMTMsNzMuNTdjMCwzLjgyLDEuMDEsOC4zOCwyLjI0LDExLjQ0LDMuMTQsNy44LDkuOTIsMTAuNjgsMTcuNjIsMTAuNzEsMTEuODUuMDQsMjAuMDktNy40MiwyMS45NS0xOS41MmwuMDktNzUuOTksMzcuMzItLjIzdi0uMDJaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI5OS4xNCwxMzYuNjZjOS40NCw3LjM0LDI5Ljk1LDUuNjIsMzguNDEtNy41NWwzMy4yNy4wNGMtOC4wMywzMy44OC00NC43OSw0My43My03Ni4xNCwzNi4yNy0xOC44OS00LjUtMzMuMjEtMTguMDUtMzguOTgtMzYuNTMtOS43Ny0zMS4yNy0xLjcxLTcxLjQxLDI5Ljg5LTg0LjY3LDE2LjcxLTcuMDEsMzYuMjEtNy4wNiw1Mi44Ny0uMTQsMjcuMywxMS4zNCwzNS40NCwzOS40MiwzMy4xNyw2OC4xbC04Mi45NC4xMWMtLjMyLDkuNDcsMi45NywxOC41NSwxMC40NSwyNC4zN2gwWk0xMzM3LjA2LDg5LjcxYy0xLjc0LTcuODMtNC4wNi0xNC45OC0xMC41MS0xOS42My04LjMzLTYuMDEtMjEuMDYtNS42OS0yOC45NSwxLjE3LTUuNDUsNC43NC03LjgzLDExLjY0LTguNzgsMTguNDhsNDguMjMtLjAyaC4wMVoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjQ0LjA1LDEzNy4wN2wtLjA1LDI3LjI1Yy0xMy4wNSwxLjItMjQuNTMsMS41MS0zNi41Ni0uNDctMTUuMzgtMi41My0yNS4xLTE0LjExLTI1LjE2LTI5LjhsLS4yNi02NC41Ny0xOC40Ny0uMjQtLjA4LTI3LjUyLDE4LjYtLjEyLS4wMi0yOC4zNCwzNy41LS4wNy0uMTYsMjguMjcsMjAuMjIuMjZjLjg1LDAsMi42My4yNywzLjIzLjYyLjc5LjQ1LDEuMjgsMi43LDEuMjcsMy43NWwtLjExLDIzLjE3LTI0LjQ0LjE4LjAyLDU1LjgyYzAsNC41LDIuNTcsOC40LDUuODYsMTAuOTYsNi4xMywxLjg1LDEwLjM1LDIsMTguNi44NGguMDFaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQxOC4yNCwxNjQuOTdsLTMzLjIxLS4zNC4wNy0xMjMuMDMsMzYuNjUuMTksMS4wNSwyMC4zOGM0LjgzLTkuMDYsNy44MS0xNS45NiwxNi40Mi0xOS4zOCw4LjgtMy40OSwxOC43Ny00LjAyLDI3Ljc4LTEuMTVsLS4wOCwzMWMtOS43OC0uODMtMTguMjQtMi41NS0yNy4wNS4xMS05Ljc3LDIuOTUtMTcuMzksMTEuNjYtMTcuNDIsMjIuMTlsLS4xNyw2Ni40MWMwLDEuMzctMi4zMiwzLjY0LTQuMDQsMy42MloiLz4KICA8L2c+CiAgPGc+CiAgICA8cGF0aCBkPSJNMTExLjM1LDEwNy45M2wzNy4zNi0uMThjLTEuMDIsMjYuNC0xNy42LDQ3LjM2LTQxLjQ2LDU2LjMyLTI5LjM0LDEwLjI3LTY2LjQ1LDUuNjUtODcuMjMtMTguMjctOC4zOC05LjY1LTEzLjk1LTIwLjc0LTE2Ljc4LTMzLjI2Qy00LjI4LDc5LjI2LjMsMzguOCwyNy40NCwxNi4yLDUwLjY2LTMuMTIsODkuNzgtNC45OCwxMTYuMDksOS42N2MxOS4zMSwxMC45MSwzMS44MywzMC4wNSwzMi41MSw1Mi43OGgtMzcuMjFjLTIuMDMtMTQuNzktMTEuNjQtMjYuMDctMjUuODctMjkuMjYtMTcuMS0zLjk1LTMzLjU0LDQuMjQtNDAuNDMsMjAuOTQtNy45LDE5LjE1LTcuOTYsNDIuMDUuMDgsNjEuMTcsNi41OSwxNS42OCwyMS41NiwyMy43NywzNy44LDIxLjQ3LDE0LjU3LTIuNTEsMjYuMTMtMTIuNTksMjguMzktMjguODNoMFoiLz4KICAgIDxwYXRoIGQ9Ik0yNzguMTgsMTI3LjgxYy05Ljg0LDM0Ljk5LTQ2LjcxLDQ2LTc5LjU3LDM3LjM0LTE3LjgzLTQuNy0zMS40Mi0xNy4xOS0zNy4yMS0zNC44LTUuMy0xNi4xMy01LjU5LTMzLjkxLTEuMDgtNTAuMzUsNS4zOS0xOS42NiwyMC40Ny0zNC4xNCw0MC4xLTM4LjgzLDMxLjM0LTcuNDgsNjUuNDgsMi43Myw3Ni42LDM0LjU4LDUuODUsMTYuNzYsNS45NywzNC45NSwxLjE2LDUyLjA1aDBaTTI0MC4wNCw4Mi45NWMtMy4zNi05LjQ4LTEwLjc4LTE1LjEyLTIwLjE3LTE1LjI5LTkuMTUtLjE3LTE3LjA4LDQuOTMtMjAuNzgsMTQuNDItNS4yOCwxMy41My01LjM0LDI5LjcuMTcsNDMuMjMsMy43Miw5LjEzLDExLjg1LDE0LjA5LDIwLjc0LDEzLjg5LDIzLjE2LS41MywyNy45OS0zMy44MywyMC4wNS01Ni4yNWgtLjAxWiIvPgogICAgPHBhdGggZD0iTTM2NC4xMyw3Mi4wMmMtNi4zLTMuNDgtMTQuODQtMy4zMy0yMC44NC0uMDctNy43NCw0LjE5LTEwLjc3LDEyLjI4LTExLjM5LDIwLjc0bC0uMDQsNzIuMjhoLTM3LjM0VjQxLjY2bDM3LjA1LS4wNy43OSwyMC4yOGM3LjkzLTE2LjA3LDIwLjY2LTIzLjI5LDM3LjI1LTIyLjg5LDEwLjk2LjI3LDIxLjczLDIuNDcsMjkuNTMsMTAuNyw4LjU4LDkuMDQsMTEsMjAuNzUsMTIuMDMsMzMuMjZsLjEsODIuMDRoLTM3LjY2bC0uMDUtNzYuNjhjLTEuMDQtNi40NS0zLjE0LTEyLjgxLTkuNDItMTYuMjloMFoiLz4KICAgIDxwYXRoIGQ9Ik00ODUuMDQsMTQwLjY3YzkuNi4yMywxOC4wMi0zLjQ2LDIyLjk0LTExLjUybDM0LjIzLS4wNmMtOC4yOSwzNC41Ni00NS45NSw0NC4yNS03Ny43MiwzNi4xNy0zNi44Ni05LjM4LTQ3LjgtNTAuMzctMzguMzktODUuMjIsNy4yNS0yNi44NiwzMC41Mi00MS4yOCw1Ny40NS00MS4yOSwyOC43Ni0uMDIsNTMuMjksMTcuMjIsNTguMTIsNDYuNzUsMS4zNyw4LjM5LDEuNTksMTcuMzMsMS42LDI2LjY5bC04My4yNS4wOWMtLjcxLDE1LjE0LDguNDMsMjguNywyNS4wMiwyOC40aDBaTTUwNy44MSw4OS42NmMtMS4xMS02LjMxLTIuNzQtMTEuNzItNi42LTE2LjE5LTYuNi03LjY1LTE3LjQ1LTkuNTItMjcuMDUtNS40LTcuNjQsMy4yNy0xMy44MiwxMi40NS0xMy41LDIxLjU4aDQ3LjE1WiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI2NjUuODUgMTY0LjkxIDYyNS4wMyAxNjUuMDMgNjAzLjMzIDEyNS4wOSA1ODEuNjMgMTY0Ljk4IDU0Mi42NiAxNjQuODEgNTgwLjAxIDEwNC4yIDU0Mi4yNSA0MS42MyA1ODQuNzUgNDEuNTcgNjA0Ljk5IDgyLjAzIDYyNS4zNyA0MS41NiA2NjUuOTkgNDEuNjIgNjI4LjA5IDEwMi42NyA2NjUuODUgMTY0LjkxIi8+CiAgICA8cGF0aCBkPSJNNzQ3LjMzLDEzNy4xN3YyNy4xYy0xMy40MywxLjc0LTI2LjYxLDEuOTYtMzkuNzgtMS4wNHMtMjEuNzQtMTIuNzEtMjEuODEtMjYuMThsLS4zOS02Ny40NC0xOC43Ni0uMzItLjA2LTI3LjU3LDE4LjgxLS4zMS0uMDYtMjguMzIsMzcuNTYuMDkuMDYsMjguMzQsMjQuNDEuMDguMDUsMjcuNzEtMjQuNTIuMjUuMSw1Ni4yNmMwLDQuOSwzLjMyLDguNjksNy4yNSwxMC45LDUuNzEsMS4wOSwxMC40NCwxLjE2LDE3LjE1LjQ1aDBaIi8+CiAgPC9nPgo8L3N2Zz4=" alt="ConextRouter" style="height:18px;width:auto;object-fit:contain;">
+    </a>
+    <nav class="nav-links">
+      <a href="#produk">Produk</a>
+      <a href="#cara-kerja">Cara Kerja</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a href="../dashboard/dashboard_full_v5_enterprise.html" class="btn btn-ghost">Masuk</a>
+      <a href="#produk" class="btn btn-dark">Buat Akun Gratis</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5H16M2 9H16M2 13H16" stroke="#1A1615" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<main id="top">
+  <section class="hero">
+    <div class="sky"></div>
+    <div class="cloud cloud-a"></div>
+    <div class="cloud cloud-b"></div>
+    <div class="cloud cloud-c"></div>
+
+    <div class="hero-content wrap">
+      <span class="eyebrow">Didukung <img src="images/AlibabaCloudLogo.svg" alt="Alibaba Cloud" class="eyebrow-logo"></span>
+      <h1 id="heroTitle" aria-label="Satu API. Semua model AI."></h1>
+      <p class="lead">Top up saldo, buat API key, lalu langsung pakai. ConextRouter otomatis memilih model yang paling sesuai untuk setiap request, jadi kamu bisa fokus membangun produk.</p>
+      <div class="hero-ctas">
+        <a href="#produk" class="btn btn-dark">Buat Akun Gratis</a>
+        <a href="#cara-kerja" class="btn btn-light">Lihat Cara Kerja</a>
+      </div>
+    </div>
+
+    <div class="mock-wrap">
+      <div class="mock-outer">
+        <div class="mock-inner">
+          <div class="mock-bar">
+            <div class="mock-dots"><span></span><span></span><span></span></div>
+            <div class="mock-url">dashboard.conextrouter.id</div>
+            <div style="width:60px"></div>
+          </div>
+          <div class="dash-shell">
+            <div class="dash-side">
+              <div class="side-logo">C</div>
+              <div class="side-icon active"><svg viewBox="0 0 20 20" fill="none"><path d="M3 9.5L10 4l7 5.5M5 8.5V16h10V8.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="side-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="7.5" cy="7.5" r="4" stroke="currentColor" stroke-width="1.6"/><path d="M10.3 10.3L16 16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+              <div class="side-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M4 16V9M10 16V4M16 16v-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+              <div class="side-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 8.5h14" stroke="currentColor" stroke-width="1.6"/></svg></div>
+            </div>
+            <div class="dash-main">
+              <div class="dash-topbar">
+                <span class="title">Dashboard</span>
+                <div class="right">
+                  <svg class="dash-bell" width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M5 8a5 5 0 0110 0c0 3.2 1 4.3 1 4.3H4S5 11.2 5 8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  <div class="dash-avatar"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7.2" r="3.2" fill="rgba(255,255,255,.92)"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+                </div>
+              </div>
+              <div class="dash-balance">
+                <div class="lbl">Saldo Aktif</div>
+                <div class="val">Rp 842.500</div>
+                <div class="mock-bars">
+                  <div style="height:35%"></div><div style="height:55%"></div><div style="height:40%"></div>
+                  <div style="height:70%"></div><div style="height:58%"></div><div style="height:85%"></div><div style="height:62%"></div>
+                </div>
+              </div>
+              <div class="dash-stats-row">
+                <div class="dash-stat-chip"><div class="lbl">Token Terpakai</div><div class="val">4,2 Jt</div></div>
+                <div class="dash-stat-chip"><div class="lbl">API Keys Aktif</div><div class="val">2</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="marquee-band">
+    <div class="marquee-row">
+      <p class="marquee-label">Berbagai model AI dengan routing otomatis.</p>
+      <div class="marquee-track">
+        <span class="marquee-pill"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M11.248 18.25q-.825 0-1.568-.314a4.3 4.3 0 0 1-1.32-.874 4 4 0 0 1-1.304.214 4 4 0 0 1-2.046-.544 4.27 4.27 0 0 1-1.518-1.485 4 4 0 0 1-.56-2.095q0-.48.131-1.04A4.4 4.4 0 0 1 2.04 10.71a4.07 4.07 0 0 1 .017-3.4 4.2 4.2 0 0 1 1.056-1.418 3.8 3.8 0 0 1 1.6-.842 3.9 3.9 0 0 1 .76-1.683q.593-.759 1.451-1.188a4.04 4.04 0 0 1 1.832-.429q.825 0 1.567.313.742.314 1.32.875a4 4 0 0 1 1.304-.215q1.106 0 2.046.545a4.14 4.14 0 0 1 1.501 1.485q.578.941.578 2.095 0 .48-.132 1.04.66.61 1.023 1.419.363.792.363 1.666 0 .892-.38 1.717a4.3 4.3 0 0 1-1.072 1.435 3.8 3.8 0 0 1-1.584.825 3.8 3.8 0 0 1-.775 1.683 4.06 4.06 0 0 1-1.436 1.188 4.04 4.04 0 0 1-1.832.429m-4.076-2.062q.825 0 1.435-.347l3.103-1.782a.36.36 0 0 0 .164-.313v-1.42L7.881 14.62a.67.67 0 0 1-.726 0l-3.118-1.798a.5.5 0 0 1-.017.115v.198q0 .841.396 1.551.413.693 1.139 1.089a3.2 3.2 0 0 0 1.617.412m.165-2.69a.4.4 0 0 0 .181.05q.083 0 .165-.05l1.238-.71-3.977-2.31a.7.7 0 0 1-.363-.643v-3.58q-.825.362-1.32 1.122a2.9 2.9 0 0 0-.495 1.65q0 .809.413 1.55.412.743 1.072 1.123zm3.91 3.663q.875 0 1.585-.396a2.96 2.96 0 0 0 1.534-2.64v-3.564a.32.32 0 0 0-.165-.297l-1.254-.726v4.604a.7.7 0 0 1-.363.643l-3.119 1.799a3 3 0 0 0 1.783.577m.627-6.039V8.878L10.01 7.822 8.129 8.878v2.244l1.881 1.056zM7.057 5.859a.7.7 0 0 1 .363-.644l3.119-1.798a3 3 0 0 0-1.782-.578q-.874 0-1.584.396A2.96 2.96 0 0 0 6.05 4.324a3.07 3.07 0 0 0-.396 1.551v3.547q0 .199.165.314l1.237.726zm8.383 7.887q.825-.364 1.303-1.123.495-.758.495-1.65a3.15 3.15 0 0 0-.412-1.55q-.413-.743-1.073-1.123l-3.086-1.782q-.099-.065-.181-.049a.3.3 0 0 0-.165.05l-1.238.692 3.993 2.327a.6.6 0 0 1 .264.264.64.64 0 0 1 .1.363zm-3.317-8.382a.63.63 0 0 1 .726 0l3.135 1.831v-.297q0-.792-.396-1.501a2.86 2.86 0 0 0-1.105-1.155q-.71-.43-1.65-.43-.825 0-1.436.347L8.294 5.941a.36.36 0 0 0-.165.314v1.418z"/></svg>OpenAI</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>Google Gemini</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg>Anthropic Claude</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.919 14.545 20.817 9.17l1.47-2.544a.56.56 0 0 0 0-.566l-1.633-2.83a.57.57 0 0 0-.49-.283h-6.207L12.487.402a.57.57 0 0 0-.49-.284H8.732a.56.56 0 0 0-.49.284L5.139 5.775h-2.94a.56.56 0 0 0-.49.284L.077 8.887a.56.56 0 0 0 0 .567L3.18 14.83l-1.47 2.545a.56.56 0 0 0 0 .566l1.634 2.83a.57.57 0 0 0 .49.283h6.205l1.47 2.545a.57.57 0 0 0 .49.284h3.266a.57.57 0 0 0 .49-.284l3.104-5.375h2.94a.57.57 0 0 0 .49-.283l1.634-2.828a.55.55 0 0 0-.004-.568M8.733.686l1.634 2.828-1.634 2.828H21.8L20.164 9.17H7.425L5.63 6.06Zm1.306 19.801-6.205-.002 1.634-2.83h3.265L2.201 6.344h3.267q3.182 5.517 6.367 11.032zm10.124-5.66L18.53 12l-6.532 11.315-1.634-2.83c2.129-3.673 4.25-7.351 6.373-11.028h3.592l3.102 5.374z"/></svg>Alibaba Qwen</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.748 4.651c-.254-.124-.364.113-.512.233-.051.04-.094.09-.137.137-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.155-.708-.311-.955-.65-.172-.24-.219-.509-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.094.172.187.129.323-.082.28-.18.553-.266.833-.055.179-.137.218-.328.14a5.5 5.5 0 0 1-1.737-1.179c-.857-.828-1.631-1.743-2.597-2.46a12 12 0 0 0-.689-.47c-.985-.957.13-1.743.387-1.836.27-.098.094-.433-.778-.428-.872.003-1.67.295-2.687.685a3 3 0 0 1-.465.136 9.6 9.6 0 0 0-2.883-.101c-1.885.21-3.39 1.1-4.497 2.622C.082 8.776-.231 10.854.152 13.02c.403 2.284 1.568 4.175 3.36 5.653 1.857 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.132-.284 4.994-1.86.47.234.962.328 1.78.398.629.058 1.235-.031 1.705-.129.735-.155.684-.836.418-.961-2.155-1.004-1.682-.595-2.112-.926 1.095-1.295 2.768-3.598 3.284-6.733.05-.346.115-.834.108-1.114-.004-.171.035-.238.23-.257a4.2 4.2 0 0 0 1.545-.475c1.397-.763 1.96-2.016 2.093-3.517.02-.23-.004-.467-.247-.588M11.58 18.168c-2.088-1.642-3.101-2.183-3.52-2.16-.39.024-.32.472-.234.763.09.288.207.487.371.74.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.168-1.361-.801-2.5-1.86-3.301-3.306-.775-1.393-1.225-2.888-1.299-4.482-.02-.385.094-.522.477-.592a4.7 4.7 0 0 1 1.53-.038c2.131.311 3.946 1.264 5.467 2.774.868.86 1.525 1.887 2.202 2.89.72 1.066 1.494 2.082 2.48 2.915.348.291.626.513.892.677-.802.09-2.14.109-3.055-.615zm1.001-6.44a.306.306 0 0 1 .415-.287.3.3 0 0 1 .113.074.3.3 0 0 1 .086.214c0 .17-.136.307-.308.307a.303.303 0 0 1-.306-.307m3.11 1.596c-.2.081-.4.151-.591.16a1.25 1.25 0 0 1-.798-.254c-.274-.23-.47-.358-.551-.758a1.7 1.7 0 0 1 .015-.588c.07-.327-.007-.537-.238-.727-.188-.156-.426-.199-.689-.199a.6.6 0 0 1-.254-.078.253.253 0 0 1-.114-.358 1 1 0 0 1 .192-.21c.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.392.451.462.576.685.915.176.264.336.536.446.848.066.194-.02.353-.25.45"/></svg>DeepSeek</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.73.032c-1.333 0-2.032 1.016-2.032 2.285 0 2.223 2.127 4.953 4.318 4.953 1.301 0 2-.953 2-2.254 0-2.254-2.095-4.984-4.286-4.984m8.413 2.984c-1.968 0-3.397 2.73-3.397 4.825 0 1.556.794 3.016 2.254 3.016 2 0 3.365-2.762 3.365-4.794 0-1.523-.762-3.047-2.222-3.047M4.857 4.159c-1.968 0-3.778 1.016-3.778 2.54 0 1.65 2.16 2.793 4.254 2.793 1.873 0 3.778-.92 3.778-2.508 0-1.682-2.159-2.825-4.254-2.825m-.222 6.476C2.413 10.635 0 13.175 0 15.397c0 1.301.825 2.159 2.095 2.159 2.19 0 4.603-2.508 4.603-4.794 0-1.27-.761-2.127-2.063-2.127m16.667.698c-2.223 0-5.016 1.62-5.016 3.651 0 1.238 1.047 2.19 2.698 2.19 2.159 0 5.016-1.587 5.016-3.682 0-1.302-1.08-2.159-2.698-2.159M7.619 16c-1.524 0-2.38 1.746-2.38 3.429 0 2.063 1.269 4.54 3.047 4.54 1.524 0 2.38-1.81 2.38-3.461C10.667 18.57 9.46 16 7.62 16m6.571 1.016c-1.333 0-2.476.667-2.476 2.032 0 2.095 2.667 4.063 4.92 4.063 1.366 0 2.54-.73 2.54-2.063 0-2.032-2.698-4.032-4.984-4.032"/></svg>Meta Llama</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.143 3.429v3.428h-3.429v3.429h-3.428V6.857H6.857V3.43H3.43v13.714H0v3.428h10.286v-3.428H6.857v-3.429h3.429v3.429h3.429v-3.429h3.428v3.429h-3.428v3.428H24v-3.428h-3.43V3.429z"/></svg>Mistral AI</span>
+        <span class="marquee-pill"><svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M11.248 18.25q-.825 0-1.568-.314a4.3 4.3 0 0 1-1.32-.874 4 4 0 0 1-1.304.214 4 4 0 0 1-2.046-.544 4.27 4.27 0 0 1-1.518-1.485 4 4 0 0 1-.56-2.095q0-.48.131-1.04A4.4 4.4 0 0 1 2.04 10.71a4.07 4.07 0 0 1 .017-3.4 4.2 4.2 0 0 1 1.056-1.418 3.8 3.8 0 0 1 1.6-.842 3.9 3.9 0 0 1 .76-1.683q.593-.759 1.451-1.188a4.04 4.04 0 0 1 1.832-.429q.825 0 1.567.313.742.314 1.32.875a4 4 0 0 1 1.304-.215q1.106 0 2.046.545a4.14 4.14 0 0 1 1.501 1.485q.578.941.578 2.095 0 .48-.132 1.04.66.61 1.023 1.419.363.792.363 1.666 0 .892-.38 1.717a4.3 4.3 0 0 1-1.072 1.435 3.8 3.8 0 0 1-1.584.825 3.8 3.8 0 0 1-.775 1.683 4.06 4.06 0 0 1-1.436 1.188 4.04 4.04 0 0 1-1.832.429m-4.076-2.062q.825 0 1.435-.347l3.103-1.782a.36.36 0 0 0 .164-.313v-1.42L7.881 14.62a.67.67 0 0 1-.726 0l-3.118-1.798a.5.5 0 0 1-.017.115v.198q0 .841.396 1.551.413.693 1.139 1.089a3.2 3.2 0 0 0 1.617.412m.165-2.69a.4.4 0 0 0 .181.05q.083 0 .165-.05l1.238-.71-3.977-2.31a.7.7 0 0 1-.363-.643v-3.58q-.825.362-1.32 1.122a2.9 2.9 0 0 0-.495 1.65q0 .809.413 1.55.412.743 1.072 1.123zm3.91 3.663q.875 0 1.585-.396a2.96 2.96 0 0 0 1.534-2.64v-3.564a.32.32 0 0 0-.165-.297l-1.254-.726v4.604a.7.7 0 0 1-.363.643l-3.119 1.799a3 3 0 0 0 1.783.577m.627-6.039V8.878L10.01 7.822 8.129 8.878v2.244l1.881 1.056zM7.057 5.859a.7.7 0 0 1 .363-.644l3.119-1.798a3 3 0 0 0-1.782-.578q-.874 0-1.584.396A2.96 2.96 0 0 0 6.05 4.324a3.07 3.07 0 0 0-.396 1.551v3.547q0 .199.165.314l1.237.726zm8.383 7.887q.825-.364 1.303-1.123.495-.758.495-1.65a3.15 3.15 0 0 0-.412-1.55q-.413-.743-1.073-1.123l-3.086-1.782q-.099-.065-.181-.049a.3.3 0 0 0-.165.05l-1.238.692 3.993 2.327a.6.6 0 0 1 .264.264.64.64 0 0 1 .1.363zm-3.317-8.382a.63.63 0 0 1 .726 0l3.135 1.831v-.297q0-.792-.396-1.501a2.86 2.86 0 0 0-1.105-1.155q-.71-.43-1.65-.43-.825 0-1.436.347L8.294 5.941a.36.36 0 0 0-.165.314v1.418z"/></svg>OpenAI</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81"/></svg>Google Gemini</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.3041 3.541h-3.6718l6.696 16.918H24Zm-10.6082 0L0 20.459h3.7442l1.3693-3.5527h7.0052l1.3693 3.5528h3.7442L10.5363 3.5409Zm-.3712 10.2232 2.2914-5.9456 2.2914 5.9456Z"/></svg>Anthropic Claude</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.919 14.545 20.817 9.17l1.47-2.544a.56.56 0 0 0 0-.566l-1.633-2.83a.57.57 0 0 0-.49-.283h-6.207L12.487.402a.57.57 0 0 0-.49-.284H8.732a.56.56 0 0 0-.49.284L5.139 5.775h-2.94a.56.56 0 0 0-.49.284L.077 8.887a.56.56 0 0 0 0 .567L3.18 14.83l-1.47 2.545a.56.56 0 0 0 0 .566l1.634 2.83a.57.57 0 0 0 .49.283h6.205l1.47 2.545a.57.57 0 0 0 .49.284h3.266a.57.57 0 0 0 .49-.284l3.104-5.375h2.94a.57.57 0 0 0 .49-.283l1.634-2.828a.55.55 0 0 0-.004-.568M8.733.686l1.634 2.828-1.634 2.828H21.8L20.164 9.17H7.425L5.63 6.06Zm1.306 19.801-6.205-.002 1.634-2.83h3.265L2.201 6.344h3.267q3.182 5.517 6.367 11.032zm10.124-5.66L18.53 12l-6.532 11.315-1.634-2.83c2.129-3.673 4.25-7.351 6.373-11.028h3.592l3.102 5.374z"/></svg>Alibaba Qwen</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.748 4.651c-.254-.124-.364.113-.512.233-.051.04-.094.09-.137.137-.372.397-.806.657-1.373.626-.829-.046-1.537.214-2.163.848-.133-.782-.575-1.248-1.247-1.548-.352-.155-.708-.311-.955-.65-.172-.24-.219-.509-.305-.774-.055-.16-.11-.323-.293-.35-.2-.031-.278.136-.356.276-.313.572-.434 1.202-.422 1.84.027 1.436.633 2.58 1.838 3.393.137.094.172.187.129.323-.082.28-.18.553-.266.833-.055.179-.137.218-.328.14a5.5 5.5 0 0 1-1.737-1.179c-.857-.828-1.631-1.743-2.597-2.46a12 12 0 0 0-.689-.47c-.985-.957.13-1.743.387-1.836.27-.098.094-.433-.778-.428-.872.003-1.67.295-2.687.685a3 3 0 0 1-.465.136 9.6 9.6 0 0 0-2.883-.101c-1.885.21-3.39 1.1-4.497 2.622C.082 8.776-.231 10.854.152 13.02c.403 2.284 1.568 4.175 3.36 5.653 1.857 1.533 3.997 2.284 6.438 2.14 1.482-.085 3.132-.284 4.994-1.86.47.234.962.328 1.78.398.629.058 1.235-.031 1.705-.129.735-.155.684-.836.418-.961-2.155-1.004-1.682-.595-2.112-.926 1.095-1.295 2.768-3.598 3.284-6.733.05-.346.115-.834.108-1.114-.004-.171.035-.238.23-.257a4.2 4.2 0 0 0 1.545-.475c1.397-.763 1.96-2.016 2.093-3.517.02-.23-.004-.467-.247-.588M11.58 18.168c-2.088-1.642-3.101-2.183-3.52-2.16-.39.024-.32.472-.234.763.09.288.207.487.371.74.114.167.192.416-.113.603-.673.416-1.842-.14-1.897-.168-1.361-.801-2.5-1.86-3.301-3.306-.775-1.393-1.225-2.888-1.299-4.482-.02-.385.094-.522.477-.592a4.7 4.7 0 0 1 1.53-.038c2.131.311 3.946 1.264 5.467 2.774.868.86 1.525 1.887 2.202 2.89.72 1.066 1.494 2.082 2.48 2.915.348.291.626.513.892.677-.802.09-2.14.109-3.055-.615zm1.001-6.44a.306.306 0 0 1 .415-.287.3.3 0 0 1 .113.074.3.3 0 0 1 .086.214c0 .17-.136.307-.308.307a.303.303 0 0 1-.306-.307m3.11 1.596c-.2.081-.4.151-.591.16a1.25 1.25 0 0 1-.798-.254c-.274-.23-.47-.358-.551-.758a1.7 1.7 0 0 1 .015-.588c.07-.327-.007-.537-.238-.727-.188-.156-.426-.199-.689-.199a.6.6 0 0 1-.254-.078.253.253 0 0 1-.114-.358 1 1 0 0 1 .192-.21c.356-.202.767-.136 1.146.016.352.144.618.408 1.001.782.392.451.462.576.685.915.176.264.336.536.446.848.066.194-.02.353-.25.45"/></svg>DeepSeek</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.73.032c-1.333 0-2.032 1.016-2.032 2.285 0 2.223 2.127 4.953 4.318 4.953 1.301 0 2-.953 2-2.254 0-2.254-2.095-4.984-4.286-4.984m8.413 2.984c-1.968 0-3.397 2.73-3.397 4.825 0 1.556.794 3.016 2.254 3.016 2 0 3.365-2.762 3.365-4.794 0-1.523-.762-3.047-2.222-3.047M4.857 4.159c-1.968 0-3.778 1.016-3.778 2.54 0 1.65 2.16 2.793 4.254 2.793 1.873 0 3.778-.92 3.778-2.508 0-1.682-2.159-2.825-4.254-2.825m-.222 6.476C2.413 10.635 0 13.175 0 15.397c0 1.301.825 2.159 2.095 2.159 2.19 0 4.603-2.508 4.603-4.794 0-1.27-.761-2.127-2.063-2.127m16.667.698c-2.223 0-5.016 1.62-5.016 3.651 0 1.238 1.047 2.19 2.698 2.19 2.159 0 5.016-1.587 5.016-3.682 0-1.302-1.08-2.159-2.698-2.159M7.619 16c-1.524 0-2.38 1.746-2.38 3.429 0 2.063 1.269 4.54 3.047 4.54 1.524 0 2.38-1.81 2.38-3.461C10.667 18.57 9.46 16 7.62 16m6.571 1.016c-1.333 0-2.476.667-2.476 2.032 0 2.095 2.667 4.063 4.92 4.063 1.366 0 2.54-.73 2.54-2.063 0-2.032-2.698-4.032-4.984-4.032"/></svg>Meta Llama</span>
+        <span class="marquee-pill"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.143 3.429v3.428h-3.429v3.429h-3.428V6.857H6.857V3.43H3.43v13.714H0v3.428h10.286v-3.428H6.857v-3.429h3.429v3.429h3.429v-3.429h3.428v3.429h-3.428v3.428H24v-3.428h-3.43V3.429z"/></svg>Mistral AI</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="why">
+    <div class="wrap">
+      <div class="how-head">
+        <div class="p-eyebrow">Kenapa ConextRouter</div>
+        <h2>Apa bedanya dengan router AI lain?</h2>
+        <p>Banyak router AI dirancang untuk pasar global. ConextRouter dibuat lebih praktis untuk kebutuhan pengguna di Indonesia.</p>
+      </div>
+      <div class="compare-table-wrap">
+        <div class="compare-table">
+          <div class="ct-highlight-frame"></div>
+          <div class="ct-row ct-head">
+            <div class="ct-cell ct-label"></div>
+            <div class="ct-cell"><div class="ct-head-title">Router<br>Self-Host</div></div>
+            <div class="ct-cell"><div class="ct-head-title">Router<br>Marketplace Global</div></div>
+            <div class="ct-cell"><div class="ct-head-title">Router<br>Enterprise Global</div></div>
+            <div class="ct-cell ct-highlight ct-head-logo"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNDY3IDE2OS4yMSI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjYuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS40IEJ1aWxkIDEwOSkgIC0tPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuc3QwIHsKICAgICAgICBmaWxsOiAjMTc1MmVkOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04ODkuNTksMTY0Ljk4bC0zNC43OS0uMjUtMjguMTMtNTYuNzVoLTIzLjQ4bC4wNSw1My40MmMwLDEuMTctMi4zMiwzLjUtMy41NCwzLjVsLTMzLjY2LS4wMy0xLjI1LTEwLjc5LjA1LTE0OS44NSw3Ni40NC4yMmM5LjU1LjAzLDE4LjU3LDMuNDMsMjYuODgsNi45OSw5LjM5LDUuMDcsMTYuMjQsMTEuOTksMjAuNjksMjEuNzEsMTAuMywyNi4xMSwzLjE4LDU3LjI5LTIzLjM2LDY5LjA5bDMyLjA0LDYxLjZjLTEuOTEuNDktNS4zOCwxLjE2LTcuOTUsMS4xNGgwWk04NTMuOTcsNTYuODVjLjU3LTE0LjI1LTEwLjMzLTIzLjIzLTIzLjQxLTIzLjE4bC0yNy4zNS4xdjQ3LjEzbDMwLjkyLS4yOGMxMi40NS0uMTEsMjAuNzctMTEuMzYsMTkuODMtMjMuNzZoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIwLjk5LDEzMC41M2MtMTEuMTksMzMuNDQtNDcuOTIsNDMuMDUtNzkuNzIsMzQuMTEtMzYuOTgtMTAuMzktNDYuOTMtNTIuOTctMzYuMjgtODYuNzUsMTEuMzYtMzYuMDYsNTIuNDUtNDYuNDUsODQuODEtMzQuMTIsMzMuOSwxMi45Miw0MS45OCw1NC41LDMxLjE4LDg2Ljc1aC4wMVpNOTg0LjAxLDgyLjk1Yy0zLjQ4LTEwLjAyLTExLjI5LTE1LjU0LTIwLjk3LTE1LjQ4cy0xNi45Niw1LjQtMjAuNDcsMTVjLTguMTQsMjIuMjUtMy4zMSw1NywyMC40OCw1Ni44NiwyNC40Ni0uMTQsMjguNy0zNC4xMiwyMC45Ni01Ni4zOGgwWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTMuODgsNDEuNjNsLS4wNCwxMjIuODMtMzcuMDEuNDktMS4wNS0xOS44OWMtOC4xMiwxNi41NC0yMS41OCwyMi45My0zOC4yOSwyMi42NS0yNi44Ni0uNDQtMzkuMTctMTguMzUtNDAuMDMtNDQuNTlsLS4wNS04MS4zMywzNy4xMy0uMTIuMTMsNzMuNTdjMCwzLjgyLDEuMDEsOC4zOCwyLjI0LDExLjQ0LDMuMTQsNy44LDkuOTIsMTAuNjgsMTcuNjIsMTAuNzEsMTEuODUuMDQsMjAuMDktNy40MiwyMS45NS0xOS41MmwuMDktNzUuOTksMzcuMzItLjIzdi0uMDJaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI5OS4xNCwxMzYuNjZjOS40NCw3LjM0LDI5Ljk1LDUuNjIsMzguNDEtNy41NWwzMy4yNy4wNGMtOC4wMywzMy44OC00NC43OSw0My43My03Ni4xNCwzNi4yNy0xOC44OS00LjUtMzMuMjEtMTguMDUtMzguOTgtMzYuNTMtOS43Ny0zMS4yNy0xLjcxLTcxLjQxLDI5Ljg5LTg0LjY3LDE2LjcxLTcuMDEsMzYuMjEtNy4wNiw1Mi44Ny0uMTQsMjcuMywxMS4zNCwzNS40NCwzOS40MiwzMy4xNyw2OC4xbC04Mi45NC4xMWMtLjMyLDkuNDcsMi45NywxOC41NSwxMC40NSwyNC4zN2gwWk0xMzM3LjA2LDg5LjcxYy0xLjc0LTcuODMtNC4wNi0xNC45OC0xMC41MS0xOS42My04LjMzLTYuMDEtMjEuMDYtNS42OS0yOC45NSwxLjE3LTUuNDUsNC43NC03LjgzLDExLjY0LTguNzgsMTguNDhsNDguMjMtLjAyaC4wMVoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjQ0LjA1LDEzNy4wN2wtLjA1LDI3LjI1Yy0xMy4wNSwxLjItMjQuNTMsMS41MS0zNi41Ni0uNDctMTUuMzgtMi41My0yNS4xLTE0LjExLTI1LjE2LTI5LjhsLS4yNi02NC41Ny0xOC40Ny0uMjQtLjA4LTI3LjUyLDE4LjYtLjEyLS4wMi0yOC4zNCwzNy41LS4wNy0uMTYsMjguMjcsMjAuMjIuMjZjLjg1LDAsMi42My4yNywzLjIzLjYyLjc5LjQ1LDEuMjgsMi43LDEuMjcsMy43NWwtLjExLDIzLjE3LTI0LjQ0LjE4LjAyLDU1LjgyYzAsNC41LDIuNTcsOC40LDUuODYsMTAuOTYsNi4xMywxLjg1LDEwLjM1LDIsMTguNi44NGguMDFaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQxOC4yNCwxNjQuOTdsLTMzLjIxLS4zNC4wNy0xMjMuMDMsMzYuNjUuMTksMS4wNSwyMC4zOGM0LjgzLTkuMDYsNy44MS0xNS45NiwxNi40Mi0xOS4zOCw4LjgtMy40OSwxOC43Ny00LjAyLDI3Ljc4LTEuMTVsLS4wOCwzMWMtOS43OC0uODMtMTguMjQtMi41NS0yNy4wNS4xMS05Ljc3LDIuOTUtMTcuMzksMTEuNjYtMTcuNDIsMjIuMTlsLS4xNyw2Ni40MWMwLDEuMzctMi4zMiwzLjY0LTQuMDQsMy42MloiLz4KICA8L2c+CiAgPGc+CiAgICA8cGF0aCBkPSJNMTExLjM1LDEwNy45M2wzNy4zNi0uMThjLTEuMDIsMjYuNC0xNy42LDQ3LjM2LTQxLjQ2LDU2LjMyLTI5LjM0LDEwLjI3LTY2LjQ1LDUuNjUtODcuMjMtMTguMjctOC4zOC05LjY1LTEzLjk1LTIwLjc0LTE2Ljc4LTMzLjI2Qy00LjI4LDc5LjI2LjMsMzguOCwyNy40NCwxNi4yLDUwLjY2LTMuMTIsODkuNzgtNC45OCwxMTYuMDksOS42N2MxOS4zMSwxMC45MSwzMS44MywzMC4wNSwzMi41MSw1Mi43OGgtMzcuMjFjLTIuMDMtMTQuNzktMTEuNjQtMjYuMDctMjUuODctMjkuMjYtMTcuMS0zLjk1LTMzLjU0LDQuMjQtNDAuNDMsMjAuOTQtNy45LDE5LjE1LTcuOTYsNDIuMDUuMDgsNjEuMTcsNi41OSwxNS42OCwyMS41NiwyMy43NywzNy44LDIxLjQ3LDE0LjU3LTIuNTEsMjYuMTMtMTIuNTksMjguMzktMjguODNoMFoiLz4KICAgIDxwYXRoIGQ9Ik0yNzguMTgsMTI3LjgxYy05Ljg0LDM0Ljk5LTQ2LjcxLDQ2LTc5LjU3LDM3LjM0LTE3LjgzLTQuNy0zMS40Mi0xNy4xOS0zNy4yMS0zNC44LTUuMy0xNi4xMy01LjU5LTMzLjkxLTEuMDgtNTAuMzUsNS4zOS0xOS42NiwyMC40Ny0zNC4xNCw0MC4xLTM4LjgzLDMxLjM0LTcuNDgsNjUuNDgsMi43Myw3Ni42LDM0LjU4LDUuODUsMTYuNzYsNS45NywzNC45NSwxLjE2LDUyLjA1aDBaTTI0MC4wNCw4Mi45NWMtMy4zNi05LjQ4LTEwLjc4LTE1LjEyLTIwLjE3LTE1LjI5LTkuMTUtLjE3LTE3LjA4LDQuOTMtMjAuNzgsMTQuNDItNS4yOCwxMy41My01LjM0LDI5LjcuMTcsNDMuMjMsMy43Miw5LjEzLDExLjg1LDE0LjA5LDIwLjc0LDEzLjg5LDIzLjE2LS41MywyNy45OS0zMy44MywyMC4wNS01Ni4yNWgtLjAxWiIvPgogICAgPHBhdGggZD0iTTM2NC4xMyw3Mi4wMmMtNi4zLTMuNDgtMTQuODQtMy4zMy0yMC44NC0uMDctNy43NCw0LjE5LTEwLjc3LDEyLjI4LTExLjM5LDIwLjc0bC0uMDQsNzIuMjhoLTM3LjM0VjQxLjY2bDM3LjA1LS4wNy43OSwyMC4yOGM3LjkzLTE2LjA3LDIwLjY2LTIzLjI5LDM3LjI1LTIyLjg5LDEwLjk2LjI3LDIxLjczLDIuNDcsMjkuNTMsMTAuNyw4LjU4LDkuMDQsMTEsMjAuNzUsMTIuMDMsMzMuMjZsLjEsODIuMDRoLTM3LjY2bC0uMDUtNzYuNjhjLTEuMDQtNi40NS0zLjE0LTEyLjgxLTkuNDItMTYuMjloMFoiLz4KICAgIDxwYXRoIGQ9Ik00ODUuMDQsMTQwLjY3YzkuNi4yMywxOC4wMi0zLjQ2LDIyLjk0LTExLjUybDM0LjIzLS4wNmMtOC4yOSwzNC41Ni00NS45NSw0NC4yNS03Ny43MiwzNi4xNy0zNi44Ni05LjM4LTQ3LjgtNTAuMzctMzguMzktODUuMjIsNy4yNS0yNi44NiwzMC41Mi00MS4yOCw1Ny40NS00MS4yOSwyOC43Ni0uMDIsNTMuMjksMTcuMjIsNTguMTIsNDYuNzUsMS4zNyw4LjM5LDEuNTksMTcuMzMsMS42LDI2LjY5bC04My4yNS4wOWMtLjcxLDE1LjE0LDguNDMsMjguNywyNS4wMiwyOC40aDBaTTUwNy44MSw4OS42NmMtMS4xMS02LjMxLTIuNzQtMTEuNzItNi42LTE2LjE5LTYuNi03LjY1LTE3LjQ1LTkuNTItMjcuMDUtNS40LTcuNjQsMy4yNy0xMy44MiwxMi40NS0xMy41LDIxLjU4aDQ3LjE1WiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI2NjUuODUgMTY0LjkxIDYyNS4wMyAxNjUuMDMgNjAzLjMzIDEyNS4wOSA1ODEuNjMgMTY0Ljk4IDU0Mi42NiAxNjQuODEgNTgwLjAxIDEwNC4yIDU0Mi4yNSA0MS42MyA1ODQuNzUgNDEuNTcgNjA0Ljk5IDgyLjAzIDYyNS4zNyA0MS41NiA2NjUuOTkgNDEuNjIgNjI4LjA5IDEwMi42NyA2NjUuODUgMTY0LjkxIi8+CiAgICA8cGF0aCBkPSJNNzQ3LjMzLDEzNy4xN3YyNy4xYy0xMy40MywxLjc0LTI2LjYxLDEuOTYtMzkuNzgtMS4wNHMtMjEuNzQtMTIuNzEtMjEuODEtMjYuMThsLS4zOS02Ny40NC0xOC43Ni0uMzItLjA2LTI3LjU3LDE4LjgxLS4zMS0uMDYtMjguMzIsMzcuNTYuMDkuMDYsMjguMzQsMjQuNDEuMDguMDUsMjcuNzEtMjQuNTIuMjUuMSw1Ni4yNmMwLDQuOSwzLjMyLDguNjksNy4yNSwxMC45LDUuNzEsMS4wOSwxMC40NCwxLjE2LDE3LjE1LjQ1aDBaIi8+CiAgPC9nPgo8L3N2Zz4=" alt="ConextRouter"></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r=".8" fill="currentColor"/></svg></div><span>Cara pilih model</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Manual, diatur sendiri melalui konfigurasi</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Manual, pilih model sendiri</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Manual atau routing otomatis dasar</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Otomatis sesuai kompleksitas tugas</span></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2.5" y="6" width="15" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2" stroke="currentColor" stroke-width="1.5"/></svg></div><span>Mata uang &amp; harga</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Gratis, tetapi biaya infrastruktur ditanggung sendiri</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>USD + sekitar 5% biaya transaksi</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>USD, mulai US$49/bulan</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Rupiah dengan harga yang transparan</span></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2.5" y="5" width="15" height="10" rx="1.8" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 8.5h15" stroke="currentColor" stroke-width="1.5"/></svg></div><span>Metode bayar</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Kartu kredit langsung ke provider AI</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Kartu kredit internasional</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Kartu kredit atau invoice perusahaan</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>QRIS, VA, atau e-wallet lokal</span></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M6 14.5a3.5 3.5 0 01-.4-6.98A4.5 4.5 0 0114.9 8.6 3.25 3.25 0 0114.25 14.5H6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div><span>Setup &amp; infrastruktur</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Self-host, kelola server dan database sendiri</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Managed cloud, tanpa opsi penyimpanan data lokal</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Managed cloud dengan setup lebih kompleks</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Terkelola, siap pakai, didukung Alibaba Cloud</span></div>
+          </div>
+          <div class="ct-row">
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="6" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="15" cy="6" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="15" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M6.6 7.4L9 13.2M13.4 7.4L11 13.2M7 6h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Ekosistem AI</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Berdiri sendiri, tanpa ekosistem produk lain</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Berdiri sendiri, tanpa integrasi ekosistem lokal</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Bagian dari platform global, bukan ekosistem lokal</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Terhubung ekosistem AI Ralali Group (AIRIN, ConextLab)</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="compare-note">Berdasarkan riset pola umum router/gateway AI global per Agustus 2026 — nama platform disamarkan.</p>
+    </div>
+  </section>
+
+  <section class="how" id="cara-kerja">
+    <div class="wrap">
+      <div class="how-head">
+        <div class="p-eyebrow">Cara Kerja</div>
+        <h2>Mulai dalam tiga langkah</h2>
+        <p>Tanpa migrasi besar. Cukup sesuaikan integrasi dan lanjutkan dengan kode yang sudah ada.</p>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="circle">1</span><h4>Buat akun</h4><p>Daftar dan verifikasi email.</p>
+          <div class="step-visual">
+            <svg class="vis-icon" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <div class="vis-bars"><span style="width:64px;"></span><span style="width:88px;"></span></div>
+            <div class="vis-chip-row">
+              <span class="vis-chip"><svg viewBox="0 0 20 20"><path fill="#4285F4" d="M19.6 10.23c0-.68-.06-1.36-.18-2.02H10v3.83h5.38a4.6 4.6 0 01-2 3.02v2.5h3.23c1.9-1.75 2.99-4.33 2.99-7.33z"/><path fill="#34A853" d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.23-2.5c-.9.6-2.06.96-3.39.96-2.6 0-4.8-1.76-5.59-4.12H1.06v2.59A10 10 0 0010 20z"/><path fill="#FBBC05" d="M4.41 11.92a6 6 0 010-3.84V5.49H1.06a10 10 0 000 9.02l3.35-2.59z"/><path fill="#EA4335" d="M10 3.96c1.47 0 2.79.5 3.83 1.5l2.87-2.87A9.6 9.6 0 0010 0 10 10 0 001.06 5.49l3.35 2.6c.79-2.37 2.99-4.13 5.59-4.13z"/></svg></span>
+              <span class="vis-chip"><svg viewBox="0 0 20 20" fill="none"><rect x="2.5" y="4.5" width="15" height="11" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M3 6l7 5 7-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </div>
+          </div>
+        </div>
+        <div class="step-arrow" aria-hidden="true">→</div>
+        <div class="step" style="transition-delay:.12s;">
+          <span class="circle">2</span><h4>Buat API key</h4><p>Atur limit pemakaian, lalu buat API key.</p>
+          <div class="step-visual">
+            <svg class="vis-icon" viewBox="0 0 20 20" fill="none"><circle cx="6.5" cy="13.5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8.6 11.4L15.5 4.5M13 7l2 2M15.5 4.5l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="vis-key-name">CONEXTROUTER_API_KEY</div>
+            <div class="vis-key-value">••••••••••••••••••••</div>
+          </div>
+        </div>
+        <div class="step-arrow" aria-hidden="true">→</div>
+        <div class="step" style="transition-delay:.24s;">
+          <span class="circle">3</span><h4>Mulai kirim request</h4><p>Ganti base URL, lalu gunakan kode yang sudah ada.</p>
+          <div class="step-visual">
+            <svg class="vis-icon" viewBox="0 0 20 20" fill="none"><path d="M17.5 2.5L2.5 8.8l5.8 2.4M17.5 2.5l-3.4 14.2-6-5.5M17.5 2.5L8.3 11.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <div class="vis-code">
+              <div class="vis-code-line"><span class="vis-code-method">POST</span><span>/v1/chat/completions</span></div>
+              <div class="vis-code-line muted">base_url: api.conextrouter.id</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="solution">
+    <div class="wrap">
+      <div class="how-head">
+        <div class="p-eyebrow">Dashboard</div>
+        <h2>Pantau semuanya dari satu dashboard</h2>
+        <p>Lihat saldo, pemakaian, dan API key dalam satu tempat.</p>
+      </div>
+      <div class="sol-frame">
+        <div class="sol-bar">
+          <div class="mock-dots"><span></span><span></span><span></span></div>
+          <div class="mock-url">dashboard.conextrouter.id</div>
+          <div style="width:60px"></div>
+        </div>
+        <img class="sol-shot" src="images/dashboard-preview.jpg" alt="Tampilan dashboard ConextRouter — saldo, pemakaian, dan API key dalam satu layar" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="services" id="produk">
+    <div class="wrap">
+      <div class="how-head">
+        <div class="p-eyebrow">Produk</div>
+        <h2>Satu platform untuk berbagai skala</h2>
+        <p>Pilih skema penggunaan sesuai kebutuhan, dari developer individu hingga tim perusahaan.</p>
+      </div>
+
+      <div class="prod-row">
+        <div class="prod-text">
+          <div class="svc-tag">Personal</div>
+          <h3>Untuk Developer Individu</h3>
+          <p class="svc-desc">Akses berbagai model AI lewat satu API key tanpa perlu mendaftar ke setiap provider. Cukup top up saldo, buat API key, lalu mulai kirim request. Cocok untuk developer individu, tim kecil, dan side project.</p>
+          <ul class="svc-list">
+            <li>Satu API key untuk mengakses berbagai model AI</li>
+            <li>Top up mulai Rp50.000 via QRIS, VA, atau e-wallet</li>
+            <li>Routing otomatis sesuai kompleksitas setiap request</li>
+            <li>Buat beberapa API key sesuai kebutuhan</li>
+          </ul>
+          <a href="#harga" class="btn btn-dark">Buat Akun Gratis</a>
+        </div>
+        <div class="prod-visual">
+          <div class="prod-card">
+            <div class="pc-row" style="border-top:none;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div class="dash-avatar"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7.2" r="3.2" fill="rgba(255,255,255,.92)"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+                <div>
+                  <div class="pc-val" style="font-size:13.5px;">Workspace Personal</div>
+                  <div class="pc-lbl" style="margin-top:2px;">1 pengguna</div>
+                </div>
+              </div>
+              <span class="mock-tag">Aktif</span>
+            </div>
+            <div class="pc-row">
+              <span class="pc-lbl">Routing Model</span>
+              <span class="mock-tag" style="background:var(--accent-soft);color:var(--accent);">Otomatis</span>
+            </div>
+            <div class="route-row">
+              <div class="task">Pertanyaan singkat &amp; cepat</div>
+              <div class="route-model">Qwen-Flash</div>
+            </div>
+            <div class="route-row">
+              <div class="task">Tugas harian, kompleksitas sedang</div>
+              <div class="route-model">Qwen-Plus</div>
+            </div>
+            <div class="route-row">
+              <div class="task">Reasoning &amp; analisis berat</div>
+              <div class="route-model">Qwen-Max</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="prod-row rev">
+        <div class="prod-text">
+          <div class="svc-tag">Enterprise · Postpaid</div>
+          <h3>Untuk Tim &amp; Perusahaan</h3>
+          <p class="svc-desc">Kelola pemakaian AI seluruh tim dengan skema postpaid. Penggunaan dihitung berdasarkan token dan ditagih melalui satu invoice bulanan, dengan akses dan budget yang dapat diatur untuk setiap user atau tim.</p>
+          <ul class="svc-list">
+            <li>Seluruh pemakaian tim dalam satu invoice bulanan</li>
+            <li>Atur role dan budget per user atau tim</li>
+            <li>Sesuaikan limit kredit dengan kebutuhan perusahaan</li>
+            <li>SLA dan dukungan teknis prioritas</li>
+          </ul>
+          <a href="#harga" class="btn btn-light">Ajukan Enterprise</a>
+        </div>
+        <div class="prod-visual">
+          <div class="prod-card dark">
+            <div class="pc-row" style="border-top:none;">
+              <span class="pc-lbl">Pemakaian Bulan Ini</span>
+              <span class="mock-tag">Live</span>
+            </div>
+            <div class="pc-big">Rp 18,4 Jt</div>
+            <div class="team-avatars">
+              <div class="team-avatar">AR</div>
+              <div class="team-avatar">DS</div>
+              <div class="team-avatar">MP</div>
+              <div class="team-avatar">+9</div>
+            </div>
+            <div class="pc-row"><span class="pc-lbl">Anggota Tim</span><span class="pc-val">12 users</span></div>
+            <div class="pc-row"><span class="pc-lbl">Invoice Terakhir</span><span class="pc-val">#INV-0842 · Lunas</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing" id="harga">
+    <div class="wrap">
+      <div class="price-head">
+        <div class="p-eyebrow">Harga</div>
+        <h2>Pilih skema sesuai kebutuhan</h2>
+        <p>Mulai dengan Personal, lalu beralih ke Enterprise saat kebutuhan tim berkembang.</p>
+      </div>
+      <div class="svc-grid">
+        <div class="svc-card">
+          <div class="svc-tag">Personal</div>
+          <h3>Untuk Developer Individu</h3>
+          <div class="price-value">Top up mulai Rp50.000</div>
+          <div class="price-sub">Bayar sesuai pemakaian</div>
+          <ul class="svc-list">
+            <li>Akses berbagai model AI melalui satu API key</li>
+            <li>Top up via QRIS, VA, atau e-wallet</li>
+            <li>Routing otomatis sesuai kompleksitas tugas</li>
+            <li>Buat beberapa API key sesuai kebutuhan</li>
+            <li>Tanpa kontrak atau biaya langganan bulanan</li>
+          </ul>
+          <a href="#" class="btn btn-dark">Buat Akun Gratis</a>
+        </div>
+        <div class="svc-card dark">
+          <span class="price-badge">Rekomendasi</span>
+          <div class="svc-tag">Enterprise</div>
+          <h3>Untuk Tim &amp; Perusahaan</h3>
+          <div class="price-value">Custom</div>
+          <div class="price-sub">Ditagih bulanan lewat satu invoice</div>
+          <ul class="svc-list">
+            <li>Semua fitur Personal untuk seluruh tim</li>
+            <li>Satu invoice bulanan tanpa top up manual</li>
+            <li>Atur role dan budget per user atau tim</li>
+            <li>Limit kredit sesuai skala perusahaan</li>
+            <li>SLA dan dukungan teknis prioritas</li>
+          </ul>
+          <a href="#" class="btn btn-light">Ajukan Enterprise</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq">
+    <div class="wrap faq-grid">
+      <div>
+        <h2>FAQ</h2>
+        <p>Jawaban singkat tentang model, pembayaran, routing, dan integrasi.</p>
+      </div>
+      <div>
+        <details open>
+          <summary>Apa itu ConextRouter?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p>Gateway API yang menghubungkan aplikasimu ke berbagai model AI lewat satu API key.</p>
+        </details>
+        <details>
+          <summary>Model AI apa yang tersedia?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p>Tersedia berbagai model dari OpenAI, Google Gemini, Anthropic Claude, Alibaba Qwen, DeepSeek, dan provider lainnya. Daftar model akan terus diperbarui.</p>
+        </details>
+        <details>
+          <summary>Bagaimana ConextRouter memilih model AI?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p>Sistem menilai kompleksitas setiap request lalu mengarahkannya ke model yang sesuai. Tugas sederhana menggunakan model yang lebih ringan, sedangkan tugas kompleks diarahkan ke model dengan kemampuan reasoning lebih tinggi.</p>
+        </details>
+        <details>
+          <summary>Bagaimana cara bayar?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p>Personal dapat top up melalui QRIS, VA, atau e-wallet. Untuk Enterprise tersedia skema tagihan bulanan.</p>
+        </details>
+        <details>
+          <summary>Apakah perlu banyak perubahan kode?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p>ConextRouter kompatibel dengan format OpenAI dan Anthropic. Pada banyak kasus, cukup ganti base URL.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <section class="final">
+    <div class="wrap">
+      <div class="final-band">
+        <div class="cloud" style="width:300px;height:120px;top:-30px;left:10%"></div>
+        <div class="cloud" style="width:260px;height:100px;top:20px;right:5%"></div>
+        <div class="final-inner">
+          <h2>Siap mulai dengan ConextRouter?</h2>
+          <p>Buat akun gratis. Saat kebutuhan tim berkembang, beralih ke Enterprise kapan saja.</p>
+          <div class="hero-ctas">
+            <a href="#produk" class="btn btn-dark">Buat Akun Gratis</a>
+            <a href="#harga" class="btn btn-light">Ajukan Enterprise</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#top" class="brand">
+          <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNDY3IDE2OS4yMSI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjYuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS40IEJ1aWxkIDEwOSkgIC0tPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuc3QwIHsKICAgICAgICBmaWxsOiAjMTc1MmVkOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04ODkuNTksMTY0Ljk4bC0zNC43OS0uMjUtMjguMTMtNTYuNzVoLTIzLjQ4bC4wNSw1My40MmMwLDEuMTctMi4zMiwzLjUtMy41NCwzLjVsLTMzLjY2LS4wMy0xLjI1LTEwLjc5LjA1LTE0OS44NSw3Ni40NC4yMmM5LjU1LjAzLDE4LjU3LDMuNDMsMjYuODgsNi45OSw5LjM5LDUuMDcsMTYuMjQsMTEuOTksMjAuNjksMjEuNzEsMTAuMywyNi4xMSwzLjE4LDU3LjI5LTIzLjM2LDY5LjA5bDMyLjA0LDYxLjZjLTEuOTEuNDktNS4zOCwxLjE2LTcuOTUsMS4xNGgwWk04NTMuOTcsNTYuODVjLjU3LTE0LjI1LTEwLjMzLTIzLjIzLTIzLjQxLTIzLjE4bC0yNy4zNS4xdjQ3LjEzbDMwLjkyLS4yOGMxMi40NS0uMTEsMjAuNzctMTEuMzYsMTkuODMtMjMuNzZoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIwLjk5LDEzMC41M2MtMTEuMTksMzMuNDQtNDcuOTIsNDMuMDUtNzkuNzIsMzQuMTEtMzYuOTgtMTAuMzktNDYuOTMtNTIuOTctMzYuMjgtODYuNzUsMTEuMzYtMzYuMDYsNTIuNDUtNDYuNDUsODQuODEtMzQuMTIsMzMuOSwxMi45Miw0MS45OCw1NC41LDMxLjE4LDg2Ljc1aC4wMVpNOTg0LjAxLDgyLjk1Yy0zLjQ4LTEwLjAyLTExLjI5LTE1LjU0LTIwLjk3LTE1LjQ4cy0xNi45Niw1LjQtMjAuNDcsMTVjLTguMTQsMjIuMjUtMy4zMSw1NywyMC40OCw1Ni44NiwyNC40Ni0uMTQsMjguNy0zNC4xMiwyMC45Ni01Ni4zOGgwWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTMuODgsNDEuNjNsLS4wNCwxMjIuODMtMzcuMDEuNDktMS4wNS0xOS44OWMtOC4xMiwxNi41NC0yMS41OCwyMi45My0zOC4yOSwyMi42NS0yNi44Ni0uNDQtMzkuMTctMTguMzUtNDAuMDMtNDQuNTlsLS4wNS04MS4zMywzNy4xMy0uMTIuMTMsNzMuNTdjMCwzLjgyLDEuMDEsOC4zOCwyLjI0LDExLjQ0LDMuMTQsNy44LDkuOTIsMTAuNjgsMTcuNjIsMTAuNzEsMTEuODUuMDQsMjAuMDktNy40MiwyMS45NS0xOS41MmwuMDktNzUuOTksMzcuMzItLjIzdi0uMDJaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI5OS4xNCwxMzYuNjZjOS40NCw3LjM0LDI5Ljk1LDUuNjIsMzguNDEtNy41NWwzMy4yNy4wNGMtOC4wMywzMy44OC00NC43OSw0My43My03Ni4xNCwzNi4yNy0xOC44OS00LjUtMzMuMjEtMTguMDUtMzguOTgtMzYuNTMtOS43Ny0zMS4yNy0xLjcxLTcxLjQxLDI5Ljg5LTg0LjY3LDE2LjcxLTcuMDEsMzYuMjEtNy4wNiw1Mi44Ny0uMTQsMjcuMywxMS4zNCwzNS40NCwzOS40MiwzMy4xNyw2OC4xbC04Mi45NC4xMWMtLjMyLDkuNDcsMi45NywxOC41NSwxMC40NSwyNC4zN2gwWk0xMzM3LjA2LDg5LjcxYy0xLjc0LTcuODMtNC4wNi0xNC45OC0xMC41MS0xOS42My04LjMzLTYuMDEtMjEuMDYtNS42OS0yOC45NSwxLjE3LTUuNDUsNC43NC03LjgzLDExLjY0LTguNzgsMTguNDhsNDguMjMtLjAyaC4wMVoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjQ0LjA1LDEzNy4wN2wtLjA1LDI3LjI1Yy0xMy4wNSwxLjItMjQuNTMsMS41MS0zNi41Ni0uNDctMTUuMzgtMi41My0yNS4xLTE0LjExLTI1LjE2LTI5LjhsLS4yNi02NC41Ny0xOC40Ny0uMjQtLjA4LTI3LjUyLDE4LjYtLjEyLS4wMi0yOC4zNCwzNy41LS4wNy0uMTYsMjguMjcsMjAuMjIuMjZjLjg1LDAsMi42My4yNywzLjIzLjYyLjc5LjQ1LDEuMjgsMi43LDEuMjcsMy43NWwtLjExLDIzLjE3LTI0LjQ0LjE4LjAyLDU1LjgyYzAsNC41LDIuNTcsOC40LDUuODYsMTAuOTYsNi4xMywxLjg1LDEwLjM1LDIsMTguNi44NGguMDFaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQxOC4yNCwxNjQuOTdsLTMzLjIxLS4zNC4wNy0xMjMuMDMsMzYuNjUuMTksMS4wNSwyMC4zOGM0LjgzLTkuMDYsNy44MS0xNS45NiwxNi40Mi0xOS4zOCw4LjgtMy40OSwxOC43Ny00LjAyLDI3Ljc4LTEuMTVsLS4wOCwzMWMtOS43OC0uODMtMTguMjQtMi41NS0yNy4wNS4xMS05Ljc3LDIuOTUtMTcuMzksMTEuNjYtMTcuNDIsMjIuMTlsLS4xNyw2Ni40MWMwLDEuMzctMi4zMiwzLjY0LTQuMDQsMy42MloiLz4KICA8L2c+CiAgPGc+CiAgICA8cGF0aCBkPSJNMTExLjM1LDEwNy45M2wzNy4zNi0uMThjLTEuMDIsMjYuNC0xNy42LDQ3LjM2LTQxLjQ2LDU2LjMyLTI5LjM0LDEwLjI3LTY2LjQ1LDUuNjUtODcuMjMtMTguMjctOC4zOC05LjY1LTEzLjk1LTIwLjc0LTE2Ljc4LTMzLjI2Qy00LjI4LDc5LjI2LjMsMzguOCwyNy40NCwxNi4yLDUwLjY2LTMuMTIsODkuNzgtNC45OCwxMTYuMDksOS42N2MxOS4zMSwxMC45MSwzMS44MywzMC4wNSwzMi41MSw1Mi43OGgtMzcuMjFjLTIuMDMtMTQuNzktMTEuNjQtMjYuMDctMjUuODctMjkuMjYtMTcuMS0zLjk1LTMzLjU0LDQuMjQtNDAuNDMsMjAuOTQtNy45LDE5LjE1LTcuOTYsNDIuMDUuMDgsNjEuMTcsNi41OSwxNS42OCwyMS41NiwyMy43NywzNy44LDIxLjQ3LDE0LjU3LTIuNTEsMjYuMTMtMTIuNTksMjguMzktMjguODNoMFoiLz4KICAgIDxwYXRoIGQ9Ik0yNzguMTgsMTI3LjgxYy05Ljg0LDM0Ljk5LTQ2LjcxLDQ2LTc5LjU3LDM3LjM0LTE3LjgzLTQuNy0zMS40Mi0xNy4xOS0zNy4yMS0zNC44LTUuMy0xNi4xMy01LjU5LTMzLjkxLTEuMDgtNTAuMzUsNS4zOS0xOS42NiwyMC40Ny0zNC4xNCw0MC4xLTM4LjgzLDMxLjM0LTcuNDgsNjUuNDgsMi43Myw3Ni42LDM0LjU4LDUuODUsMTYuNzYsNS45NywzNC45NSwxLjE2LDUyLjA1aDBaTTI0MC4wNCw4Mi45NWMtMy4zNi05LjQ4LTEwLjc4LTE1LjEyLTIwLjE3LTE1LjI5LTkuMTUtLjE3LTE3LjA4LDQuOTMtMjAuNzgsMTQuNDItNS4yOCwxMy41My01LjM0LDI5LjcuMTcsNDMuMjMsMy43Miw5LjEzLDExLjg1LDE0LjA5LDIwLjc0LDEzLjg5LDIzLjE2LS41MywyNy45OS0zMy44MywyMC4wNS01Ni4yNWgtLjAxWiIvPgogICAgPHBhdGggZD0iTTM2NC4xMyw3Mi4wMmMtNi4zLTMuNDgtMTQuODQtMy4zMy0yMC44NC0uMDctNy43NCw0LjE5LTEwLjc3LDEyLjI4LTExLjM5LDIwLjc0bC0uMDQsNzIuMjhoLTM3LjM0VjQxLjY2bDM3LjA1LS4wNy43OSwyMC4yOGM3LjkzLTE2LjA3LDIwLjY2LTIzLjI5LDM3LjI1LTIyLjg5LDEwLjk2LjI3LDIxLjczLDIuNDcsMjkuNTMsMTAuNyw4LjU4LDkuMDQsMTEsMjAuNzUsMTIuMDMsMzMuMjZsLjEsODIuMDRoLTM3LjY2bC0uMDUtNzYuNjhjLTEuMDQtNi40NS0zLjE0LTEyLjgxLTkuNDItMTYuMjloMFoiLz4KICAgIDxwYXRoIGQ9Ik00ODUuMDQsMTQwLjY3YzkuNi4yMywxOC4wMi0zLjQ2LDIyLjk0LTExLjUybDM0LjIzLS4wNmMtOC4yOSwzNC41Ni00NS45NSw0NC4yNS03Ny43MiwzNi4xNy0zNi44Ni05LjM4LTQ3LjgtNTAuMzctMzguMzktODUuMjIsNy4yNS0yNi44NiwzMC41Mi00MS4yOCw1Ny40NS00MS4yOSwyOC43Ni0uMDIsNTMuMjksMTcuMjIsNTguMTIsNDYuNzUsMS4zNyw4LjM5LDEuNTksMTcuMzMsMS42LDI2LjY5bC04My4yNS4wOWMtLjcxLDE1LjE0LDguNDMsMjguNywyNS4wMiwyOC40aDBaTTUwNy44MSw4OS42NmMtMS4xMS02LjMxLTIuNzQtMTEuNzItNi42LTE2LjE5LTYuNi03LjY1LTE3LjQ1LTkuNTItMjcuMDUtNS40LTcuNjQsMy4yNy0xMy44MiwxMi40NS0xMy41LDIxLjU4aDQ3LjE1WiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI2NjUuODUgMTY0LjkxIDYyNS4wMyAxNjUuMDMgNjAzLjMzIDEyNS4wOSA1ODEuNjMgMTY0Ljk4IDU0Mi42NiAxNjQuODEgNTgwLjAxIDEwNC4yIDU0Mi4yNSA0MS42MyA1ODQuNzUgNDEuNTcgNjA0Ljk5IDgyLjAzIDYyNS4zNyA0MS41NiA2NjUuOTkgNDEuNjIgNjI4LjA5IDEwMi42NyA2NjUuODUgMTY0LjkxIi8+CiAgICA8cGF0aCBkPSJNNzQ3LjMzLDEzNy4xN3YyNy4xYy0xMy40MywxLjc0LTI2LjYxLDEuOTYtMzkuNzgtMS4wNHMtMjEuNzQtMTIuNzEtMjEuODEtMjYuMThsLS4zOS02Ny40NC0xOC43Ni0uMzItLjA2LTI3LjU3LDE4LjgxLS4zMS0uMDYtMjguMzIsMzcuNTYuMDkuMDYsMjguMzQsMjQuNDEuMDguMDUsMjcuNzEtMjQuNTIuMjUuMSw1Ni4yNmMwLDQuOSwzLjMyLDguNjksNy4yNSwxMC45LDUuNzEsMS4wOSwxMC40NCwxLjE2LDE3LjE1LjQ1aDBaIi8+CiAgPC9nPgo8L3N2Zz4=" alt="ConextRouter" style="height:20px;width:auto;object-fit:contain;">
+        </a>
+        <p>Gateway API AI dari Ralali.</p>
+      </div>
+      <div class="foot-col">
+        <h5>Produk</h5>
+        <ul><li><a href="#produk">Personal</a></li><li><a href="#produk">Enterprise</a></li></ul>
+      </div>
+      <div class="foot-col">
+        <h5>Developer</h5>
+        <ul><li><a href="#">Dokumentasi</a></li><li><a href="#">Status</a></li></ul>
+      </div>
+      <div class="foot-col">
+        <h5>Perusahaan</h5>
+        <ul><li><a href="#">Tentang</a></li><li><a href="#">Kontak</a></li></ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p>© 2026 ConextRouter. Seluruh hak cipta dilindungi.</p>
+      <div class="powered-badge">
+        <span>Powered by</span>
+        <img src="images/ralalgroup.svg" alt="Ralali" class="powered-logo ralali">
+        <span class="powered-divider"></span>
+        <img src="images/AlibabaCloudLogo.svg" alt="Alibaba Cloud" class="powered-logo alibaba">
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+(function(){
+  var steps = document.querySelectorAll('.step');
+  if(!steps.length) return;
+  if(!('IntersectionObserver' in window)){
+    steps.forEach(function(s){ s.classList.add('in-view'); });
+    return;
+  }
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  steps.forEach(function(s){ io.observe(s); });
+})();
+
+(function(){
+  var el = document.getElementById('heroTitle');
+  if(!el) return;
+  el.innerHTML = 'Satu API.<br>Semua model AI.';
+})();
+</script>
+</body>
+</html>
