@@ -58,6 +58,24 @@
   .nav-cta{ display:flex; align-items:center; gap:6px; }
   .nav-toggle{ display:none; background:none; border:none; width:38px; height:38px; align-items:center; justify-content:center; border-radius:999px; }
 
+  /* ---------- LANGUAGE SWITCHER ---------- */
+  .lang-switch{ position:relative; }
+  .lang-btn{ display:flex; align-items:center; gap:6px; padding:9px 13px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--ink-soft); font-size:13px; font-weight:600; transition:border-color .15s ease, color .15s ease, background .15s ease; }
+  .lang-btn:hover{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+  .lang-btn .lang-chev{ transition:transform .18s ease; }
+  .lang-btn[aria-expanded="true"] .lang-chev{ transform:rotate(180deg); }
+  .lang-menu{ position:absolute; top:calc(100% + 8px); left:0; min-width:190px; background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:0 20px 44px -16px rgba(26,22,21,0.28); padding:6px; opacity:0; visibility:hidden; transform:translateY(-6px); transition:opacity .16s ease, transform .16s ease, visibility .16s; z-index:60; }
+  .lang-menu.open{ opacity:1; visibility:visible; transform:translateY(0); }
+  .lang-menu button{ display:flex; align-items:center; gap:9px; width:100%; text-align:left; padding:9px 11px; border-radius:9px; background:none; border:none; font-size:13.5px; font-weight:500; color:var(--ink-soft); }
+  .lang-menu button:hover{ background:var(--surface-alt); color:var(--ink); }
+  .lang-menu button.active{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
+  .lang-flag{ font-size:15px; line-height:1; }
+  @media (max-width:640px){
+    .lang-btn span:not(.lang-flag){ display:none; }
+    .lang-btn #langBtnLabel{ display:inline; }
+    .lang-btn{ padding:9px; }
+  }
+
   /* ---------- HERO ---------- */
   .hero{ position:relative; overflow:hidden; padding-top:120px; }
   .sky{ position:absolute; inset:0; z-index:0; background:linear-gradient(180deg, #AFCFEE 0%, #C3DCF0 20%, #DCEAF2 38%, #E9EEDB 58%, #F1E7CE 76%, #ECDCB6 100%); }
@@ -377,13 +395,26 @@
       <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNDY3IDE2OS4yMSI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjYuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS40IEJ1aWxkIDEwOSkgIC0tPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuc3QwIHsKICAgICAgICBmaWxsOiAjMTc1MmVkOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04ODkuNTksMTY0Ljk4bC0zNC43OS0uMjUtMjguMTMtNTYuNzVoLTIzLjQ4bC4wNSw1My40MmMwLDEuMTctMi4zMiwzLjUtMy41NCwzLjVsLTMzLjY2LS4wMy0xLjI1LTEwLjc5LjA1LTE0OS44NSw3Ni40NC4yMmM5LjU1LjAzLDE4LjU3LDMuNDMsMjYuODgsNi45OSw5LjM5LDUuMDcsMTYuMjQsMTEuOTksMjAuNjksMjEuNzEsMTAuMywyNi4xMSwzLjE4LDU3LjI5LTIzLjM2LDY5LjA5bDMyLjA0LDYxLjZjLTEuOTEuNDktNS4zOCwxLjE2LTcuOTUsMS4xNGgwWk04NTMuOTcsNTYuODVjLjU3LTE0LjI1LTEwLjMzLTIzLjIzLTIzLjQxLTIzLjE4bC0yNy4zNS4xdjQ3LjEzbDMwLjkyLS4yOGMxMi40NS0uMTEsMjAuNzctMTEuMzYsMTkuODMtMjMuNzZoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIwLjk5LDEzMC41M2MtMTEuMTksMzMuNDQtNDcuOTIsNDMuMDUtNzkuNzIsMzQuMTEtMzYuOTgtMTAuMzktNDYuOTMtNTIuOTctMzYuMjgtODYuNzUsMTEuMzYtMzYuMDYsNTIuNDUtNDYuNDUsODQuODEtMzQuMTIsMzMuOSwxMi45Miw0MS45OCw1NC41LDMxLjE4LDg2Ljc1aC4wMVpNOTg0LjAxLDgyLjk1Yy0zLjQ4LTEwLjAyLTExLjI5LTE1LjU0LTIwLjk3LTE1LjQ4cy0xNi45Niw1LjQtMjAuNDcsMTVjLTguMTQsMjIuMjUtMy4zMSw1NywyMC40OCw1Ni44NiwyNC40Ni0uMTQsMjguNy0zNC4xMiwyMC45Ni01Ni4zOGgwWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTMuODgsNDEuNjNsLS4wNCwxMjIuODMtMzcuMDEuNDktMS4wNS0xOS44OWMtOC4xMiwxNi41NC0yMS41OCwyMi45My0zOC4yOSwyMi42NS0yNi44Ni0uNDQtMzkuMTctMTguMzUtNDAuMDMtNDQuNTlsLS4wNS04MS4zMywzNy4xMy0uMTIuMTMsNzMuNTdjMCwzLjgyLDEuMDEsOC4zOCwyLjI0LDExLjQ0LDMuMTQsNy44LDkuOTIsMTAuNjgsMTcuNjIsMTAuNzEsMTEuODUuMDQsMjAuMDktNy40MiwyMS45NS0xOS41MmwuMDktNzUuOTksMzcuMzItLjIzdi0uMDJaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI5OS4xNCwxMzYuNjZjOS40NCw3LjM0LDI5Ljk1LDUuNjIsMzguNDEtNy41NWwzMy4yNy4wNGMtOC4wMywzMy44OC00NC43OSw0My43My03Ni4xNCwzNi4yNy0xOC44OS00LjUtMzMuMjEtMTguMDUtMzguOTgtMzYuNTMtOS43Ny0zMS4yNy0xLjcxLTcxLjQxLDI5Ljg5LTg0LjY3LDE2LjcxLTcuMDEsMzYuMjEtNy4wNiw1Mi44Ny0uMTQsMjcuMywxMS4zNCwzNS40NCwzOS40MiwzMy4xNyw2OC4xbC04Mi45NC4xMWMtLjMyLDkuNDcsMi45NywxOC41NSwxMC40NSwyNC4zN2gwWk0xMzM3LjA2LDg5LjcxYy0xLjc0LTcuODMtNC4wNi0xNC45OC0xMC41MS0xOS42My04LjMzLTYuMDEtMjEuMDYtNS42OS0yOC45NSwxLjE3LTUuNDUsNC43NC03LjgzLDExLjY0LTguNzgsMTguNDhsNDguMjMtLjAyaC4wMVoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjQ0LjA1LDEzNy4wN2wtLjA1LDI3LjI1Yy0xMy4wNSwxLjItMjQuNTMsMS41MS0zNi41Ni0uNDctMTUuMzgtMi41My0yNS4xLTE0LjExLTI1LjE2LTI5LjhsLS4yNi02NC41Ny0xOC40Ny0uMjQtLjA4LTI3LjUyLDE4LjYtLjEyLS4wMi0yOC4zNCwzNy41LS4wNy0uMTYsMjguMjcsMjAuMjIuMjZjLjg1LDAsMi42My4yNywzLjIzLjYyLjc5LjQ1LDEuMjgsMi43LDEuMjcsMy43NWwtLjExLDIzLjE3LTI0LjQ0LjE4LjAyLDU1LjgyYzAsNC41LDIuNTcsOC40LDUuODYsMTAuOTYsNi4xMywxLjg1LDEwLjM1LDIsMTguNi44NGguMDFaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQxOC4yNCwxNjQuOTdsLTMzLjIxLS4zNC4wNy0xMjMuMDMsMzYuNjUuMTksMS4wNSwyMC4zOGM0LjgzLTkuMDYsNy44MS0xNS45NiwxNi40Mi0xOS4zOCw4LjgtMy40OSwxOC43Ny00LjAyLDI3Ljc4LTEuMTVsLS4wOCwzMWMtOS43OC0uODMtMTguMjQtMi41NS0yNy4wNS4xMS05Ljc3LDIuOTUtMTcuMzksMTEuNjYtMTcuNDIsMjIuMTlsLS4xNyw2Ni40MWMwLDEuMzctMi4zMiwzLjY0LTQuMDQsMy42MloiLz4KICA8L2c+CiAgPGc+CiAgICA8cGF0aCBkPSJNMTExLjM1LDEwNy45M2wzNy4zNi0uMThjLTEuMDIsMjYuNC0xNy42LDQ3LjM2LTQxLjQ2LDU2LjMyLTI5LjM0LDEwLjI3LTY2LjQ1LDUuNjUtODcuMjMtMTguMjctOC4zOC05LjY1LTEzLjk1LTIwLjc0LTE2Ljc4LTMzLjI2Qy00LjI4LDc5LjI2LjMsMzguOCwyNy40NCwxNi4yLDUwLjY2LTMuMTIsODkuNzgtNC45OCwxMTYuMDksOS42N2MxOS4zMSwxMC45MSwzMS44MywzMC4wNSwzMi41MSw1Mi43OGgtMzcuMjFjLTIuMDMtMTQuNzktMTEuNjQtMjYuMDctMjUuODctMjkuMjYtMTcuMS0zLjk1LTMzLjU0LDQuMjQtNDAuNDMsMjAuOTQtNy45LDE5LjE1LTcuOTYsNDIuMDUuMDgsNjEuMTcsNi41OSwxNS42OCwyMS41NiwyMy43NywzNy44LDIxLjQ3LDE0LjU3LTIuNTEsMjYuMTMtMTIuNTksMjguMzktMjguODNoMFoiLz4KICAgIDxwYXRoIGQ9Ik0yNzguMTgsMTI3LjgxYy05Ljg0LDM0Ljk5LTQ2LjcxLDQ2LTc5LjU3LDM3LjM0LTE3LjgzLTQuNy0zMS40Mi0xNy4xOS0zNy4yMS0zNC44LTUuMy0xNi4xMy01LjU5LTMzLjkxLTEuMDgtNTAuMzUsNS4zOS0xOS42NiwyMC40Ny0zNC4xNCw0MC4xLTM4LjgzLDMxLjM0LTcuNDgsNjUuNDgsMi43Myw3Ni42LDM0LjU4LDUuODUsMTYuNzYsNS45NywzNC45NSwxLjE2LDUyLjA1aDBaTTI0MC4wNCw4Mi45NWMtMy4zNi05LjQ4LTEwLjc4LTE1LjEyLTIwLjE3LTE1LjI5LTkuMTUtLjE3LTE3LjA4LDQuOTMtMjAuNzgsMTQuNDItNS4yOCwxMy41My01LjM0LDI5LjcuMTcsNDMuMjMsMy43Miw5LjEzLDExLjg1LDE0LjA5LDIwLjc0LDEzLjg5LDIzLjE2LS41MywyNy45OS0zMy44MywyMC4wNS01Ni4yNWgtLjAxWiIvPgogICAgPHBhdGggZD0iTTM2NC4xMyw3Mi4wMmMtNi4zLTMuNDgtMTQuODQtMy4zMy0yMC44NC0uMDctNy43NCw0LjE5LTEwLjc3LDEyLjI4LTExLjM5LDIwLjc0bC0uMDQsNzIuMjhoLTM3LjM0VjQxLjY2bDM3LjA1LS4wNy43OSwyMC4yOGM3LjkzLTE2LjA3LDIwLjY2LTIzLjI5LDM3LjI1LTIyLjg5LDEwLjk2LjI3LDIxLjczLDIuNDcsMjkuNTMsMTAuNyw4LjU4LDkuMDQsMTEsMjAuNzUsMTIuMDMsMzMuMjZsLjEsODIuMDRoLTM3LjY2bC0uMDUtNzYuNjhjLTEuMDQtNi40NS0zLjE0LTEyLjgxLTkuNDItMTYuMjloMFoiLz4KICAgIDxwYXRoIGQ9Ik00ODUuMDQsMTQwLjY3YzkuNi4yMywxOC4wMi0zLjQ2LDIyLjk0LTExLjUybDM0LjIzLS4wNmMtOC4yOSwzNC41Ni00NS45NSw0NC4yNS03Ny43MiwzNi4xNy0zNi44Ni05LjM4LTQ3LjgtNTAuMzctMzguMzktODUuMjIsNy4yNS0yNi44NiwzMC41Mi00MS4yOCw1Ny40NS00MS4yOSwyOC43Ni0uMDIsNTMuMjksMTcuMjIsNTguMTIsNDYuNzUsMS4zNyw4LjM5LDEuNTksMTcuMzMsMS42LDI2LjY5bC04My4yNS4wOWMtLjcxLDE1LjE0LDguNDMsMjguNywyNS4wMiwyOC40aDBaTTUwNy44MSw4OS42NmMtMS4xMS02LjMxLTIuNzQtMTEuNzItNi42LTE2LjE5LTYuNi03LjY1LTE3LjQ1LTkuNTItMjcuMDUtNS40LTcuNjQsMy4yNy0xMy44MiwxMi40NS0xMy41LDIxLjU4aDQ3LjE1WiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI2NjUuODUgMTY0LjkxIDYyNS4wMyAxNjUuMDMgNjAzLjMzIDEyNS4wOSA1ODEuNjMgMTY0Ljk4IDU0Mi42NiAxNjQuODEgNTgwLjAxIDEwNC4yIDU0Mi4yNSA0MS42MyA1ODQuNzUgNDEuNTcgNjA0Ljk5IDgyLjAzIDYyNS4zNyA0MS41NiA2NjUuOTkgNDEuNjIgNjI4LjA5IDEwMi42NyA2NjUuODUgMTY0LjkxIi8+CiAgICA8cGF0aCBkPSJNNzQ3LjMzLDEzNy4xN3YyNy4xYy0xMy40MywxLjc0LTI2LjYxLDEuOTYtMzkuNzgtMS4wNHMtMjEuNzQtMTIuNzEtMjEuODEtMjYuMThsLS4zOS02Ny40NC0xOC43Ni0uMzItLjA2LTI3LjU3LDE4LjgxLS4zMS0uMDYtMjguMzIsMzcuNTYuMDkuMDYsMjguMzQsMjQuNDEuMDguMDUsMjcuNzEtMjQuNTIuMjUuMSw1Ni4yNmMwLDQuOSwzLjMyLDguNjksNy4yNSwxMC45LDUuNzEsMS4wOSwxMC40NCwxLjE2LDE3LjE1LjQ1aDBaIi8+CiAgPC9nPgo8L3N2Zz4=" alt="ConextRouter" style="height:18px;width:auto;object-fit:contain;">
     </a>
     <nav class="nav-links">
-      <a href="#produk">Produk</a>
-      <a href="#cara-kerja">Cara Kerja</a>
-      <a href="#faq">FAQ</a>
+      <a href="#produk" data-i18n="nav.produk">Produk</a>
+      <a href="#cara-kerja" data-i18n="nav.cara_kerja">Cara Kerja</a>
+      <a href="#faq" data-i18n="nav.faq">FAQ</a>
+      <a href="docs.html" data-i18n="nav.docs">Dokumentasi</a>
     </nav>
     <div class="nav-cta">
-      <a href="../dashboard/dashboard_full_v5_enterprise.html" class="btn btn-ghost">Masuk</a>
-      <a href="#produk" class="btn btn-dark">Buat Akun Gratis</a>
+      <div class="lang-switch">
+        <button class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false" type="button">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.2" stroke="currentColor" stroke-width="1.4"/><path d="M2.8 10h14.4M10 2.8c1.8 2 2.8 4.5 2.8 7.2s-1 5.2-2.8 7.2c-1.8-2-2.8-4.5-2.8-7.2s1-5.2 2.8-7.2z" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span id="langBtnLabel">ID</span>
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="lang-chev"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="lang-menu" id="langMenu" role="menu">
+          <button type="button" role="menuitem" data-lang="id"><span class="lang-flag">🇮🇩</span> Bahasa Indonesia</button>
+          <button type="button" role="menuitem" data-lang="en"><span class="lang-flag">🇬🇧</span> English</button>
+          <button type="button" role="menuitem" data-lang="zh"><span class="lang-flag">🇨🇳</span> 中文</button>
+        </div>
+      </div>
+      <a href="../dashboard/dashboard_full_v5_enterprise.html" class="btn btn-ghost" data-i18n="nav.masuk">Masuk</a>
+      <a href="#produk" class="btn btn-dark" data-i18n="hero.cta1">Buat Akun Gratis</a>
     </div>
     <button class="nav-toggle" aria-label="Menu">
       <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5H16M2 9H16M2 13H16" stroke="#1A1615" stroke-width="1.6" stroke-linecap="round"/></svg>
@@ -399,12 +430,12 @@
     <div class="cloud cloud-c"></div>
 
     <div class="hero-content wrap">
-      <span class="eyebrow">Didukung <img src="images/AlibabaCloudLogo.svg" alt="Alibaba Cloud" class="eyebrow-logo"></span>
-      <h1 id="heroTitle" aria-label="Satu API. Semua model AI."></h1>
-      <p class="lead">Top up saldo, buat API key, lalu langsung pakai. ConextRouter otomatis memilih model yang paling sesuai untuk setiap request, jadi kamu bisa fokus membangun produk.</p>
+      <span class="eyebrow"><span data-i18n="hero.eyebrow">Didukung</span> <img src="images/AlibabaCloudLogo.svg" alt="Alibaba Cloud" class="eyebrow-logo"></span>
+      <h1 id="heroTitle" data-i18n-html="hero.title" aria-label="Satu API. Semua model AI."></h1>
+      <p class="lead" data-i18n="hero.lead">Top up saldo, buat API key, lalu langsung pakai. ConextRouter otomatis memilih model yang paling sesuai untuk setiap request, jadi kamu bisa fokus membangun produk.</p>
       <div class="hero-ctas">
-        <a href="#produk" class="btn btn-dark">Buat Akun Gratis</a>
-        <a href="#cara-kerja" class="btn btn-light">Lihat Cara Kerja</a>
+        <a href="#produk" class="btn btn-dark" data-i18n="hero.cta1">Buat Akun Gratis</a>
+        <a href="#cara-kerja" class="btn btn-light" data-i18n="hero.cta2">Lihat Cara Kerja</a>
       </div>
     </div>
 
@@ -426,14 +457,14 @@
             </div>
             <div class="dash-main">
               <div class="dash-topbar">
-                <span class="title">Dashboard</span>
+                <span class="title" data-i18n="mock.dashboard_title">Dashboard</span>
                 <div class="right">
                   <svg class="dash-bell" width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M5 8a5 5 0 0110 0c0 3.2 1 4.3 1 4.3H4S5 11.2 5 8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                   <div class="dash-avatar"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7.2" r="3.2" fill="rgba(255,255,255,.92)"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
                 </div>
               </div>
               <div class="dash-balance">
-                <div class="lbl">Saldo Aktif</div>
+                <div class="lbl" data-i18n="mock.saldo">Saldo Aktif</div>
                 <div class="val">Rp 842.500</div>
                 <div class="mock-bars">
                   <div style="height:35%"></div><div style="height:55%"></div><div style="height:40%"></div>
@@ -441,8 +472,8 @@
                 </div>
               </div>
               <div class="dash-stats-row">
-                <div class="dash-stat-chip"><div class="lbl">Token Terpakai</div><div class="val">4,2 Jt</div></div>
-                <div class="dash-stat-chip"><div class="lbl">API Keys Aktif</div><div class="val">2</div></div>
+                <div class="dash-stat-chip"><div class="lbl" data-i18n="mock.token">Token Terpakai</div><div class="val">4,2 Jt</div></div>
+                <div class="dash-stat-chip"><div class="lbl" data-i18n="mock.apikeys">API Keys Aktif</div><div class="val">2</div></div>
               </div>
             </div>
           </div>
@@ -475,71 +506,71 @@
   <section class="why">
     <div class="wrap">
       <div class="how-head">
-        <div class="p-eyebrow">Kenapa ConextRouter</div>
-        <h2>Apa bedanya dengan router AI lain?</h2>
-        <p>Banyak router AI dirancang untuk pasar global. ConextRouter dibuat lebih praktis untuk kebutuhan pengguna di Indonesia.</p>
+        <div class="p-eyebrow" data-i18n="why.eyebrow">Kenapa ConextRouter</div>
+        <h2 data-i18n="why.title">Apa bedanya dengan router AI lain?</h2>
+        <p data-i18n="why.desc">Banyak router AI dirancang untuk pasar global. ConextRouter dibuat lebih praktis untuk kebutuhan pengguna di Indonesia.</p>
       </div>
       <div class="compare-table-wrap">
         <div class="compare-table">
           <div class="ct-highlight-frame"></div>
           <div class="ct-row ct-head">
             <div class="ct-cell ct-label"></div>
-            <div class="ct-cell"><div class="ct-head-title">Router<br>Self-Host</div></div>
-            <div class="ct-cell"><div class="ct-head-title">Router<br>Marketplace Global</div></div>
-            <div class="ct-cell"><div class="ct-head-title">Router<br>Enterprise Global</div></div>
+            <div class="ct-cell"><div class="ct-head-title" data-i18n-html="why.col1">Router<br>Self-Host</div></div>
+            <div class="ct-cell"><div class="ct-head-title" data-i18n-html="why.col2">Router<br>Marketplace Global</div></div>
+            <div class="ct-cell"><div class="ct-head-title" data-i18n-html="why.col3">Router<br>Enterprise Global</div></div>
             <div class="ct-cell ct-highlight ct-head-logo"><img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNDY3IDE2OS4yMSI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjYuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS40IEJ1aWxkIDEwOSkgIC0tPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuc3QwIHsKICAgICAgICBmaWxsOiAjMTc1MmVkOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04ODkuNTksMTY0Ljk4bC0zNC43OS0uMjUtMjguMTMtNTYuNzVoLTIzLjQ4bC4wNSw1My40MmMwLDEuMTctMi4zMiwzLjUtMy41NCwzLjVsLTMzLjY2LS4wMy0xLjI1LTEwLjc5LjA1LTE0OS44NSw3Ni40NC4yMmM5LjU1LjAzLDE4LjU3LDMuNDMsMjYuODgsNi45OSw5LjM5LDUuMDcsMTYuMjQsMTEuOTksMjAuNjksMjEuNzEsMTAuMywyNi4xMSwzLjE4LDU3LjI5LTIzLjM2LDY5LjA5bDMyLjA0LDYxLjZjLTEuOTEuNDktNS4zOCwxLjE2LTcuOTUsMS4xNGgwWk04NTMuOTcsNTYuODVjLjU3LTE0LjI1LTEwLjMzLTIzLjIzLTIzLjQxLTIzLjE4bC0yNy4zNS4xdjQ3LjEzbDMwLjkyLS4yOGMxMi40NS0uMTEsMjAuNzctMTEuMzYsMTkuODMtMjMuNzZoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIwLjk5LDEzMC41M2MtMTEuMTksMzMuNDQtNDcuOTIsNDMuMDUtNzkuNzIsMzQuMTEtMzYuOTgtMTAuMzktNDYuOTMtNTIuOTctMzYuMjgtODYuNzUsMTEuMzYtMzYuMDYsNTIuNDUtNDYuNDUsODQuODEtMzQuMTIsMzMuOSwxMi45Miw0MS45OCw1NC41LDMxLjE4LDg2Ljc1aC4wMVpNOTg0LjAxLDgyLjk1Yy0zLjQ4LTEwLjAyLTExLjI5LTE1LjU0LTIwLjk3LTE1LjQ4cy0xNi45Niw1LjQtMjAuNDcsMTVjLTguMTQsMjIuMjUtMy4zMSw1NywyMC40OCw1Ni44NiwyNC40Ni0uMTQsMjguNy0zNC4xMiwyMC45Ni01Ni4zOGgwWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTMuODgsNDEuNjNsLS4wNCwxMjIuODMtMzcuMDEuNDktMS4wNS0xOS44OWMtOC4xMiwxNi41NC0yMS41OCwyMi45My0zOC4yOSwyMi42NS0yNi44Ni0uNDQtMzkuMTctMTguMzUtNDAuMDMtNDQuNTlsLS4wNS04MS4zMywzNy4xMy0uMTIuMTMsNzMuNTdjMCwzLjgyLDEuMDEsOC4zOCwyLjI0LDExLjQ0LDMuMTQsNy44LDkuOTIsMTAuNjgsMTcuNjIsMTAuNzEsMTEuODUuMDQsMjAuMDktNy40MiwyMS45NS0xOS41MmwuMDktNzUuOTksMzcuMzItLjIzdi0uMDJaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI5OS4xNCwxMzYuNjZjOS40NCw3LjM0LDI5Ljk1LDUuNjIsMzguNDEtNy41NWwzMy4yNy4wNGMtOC4wMywzMy44OC00NC43OSw0My43My03Ni4xNCwzNi4yNy0xOC44OS00LjUtMzMuMjEtMTguMDUtMzguOTgtMzYuNTMtOS43Ny0zMS4yNy0xLjcxLTcxLjQxLDI5Ljg5LTg0LjY3LDE2LjcxLTcuMDEsMzYuMjEtNy4wNiw1Mi44Ny0uMTQsMjcuMywxMS4zNCwzNS40NCwzOS40MiwzMy4xNyw2OC4xbC04Mi45NC4xMWMtLjMyLDkuNDcsMi45NywxOC41NSwxMC40NSwyNC4zN2gwWk0xMzM3LjA2LDg5LjcxYy0xLjc0LTcuODMtNC4wNi0xNC45OC0xMC41MS0xOS42My04LjMzLTYuMDEtMjEuMDYtNS42OS0yOC45NSwxLjE3LTUuNDUsNC43NC03LjgzLDExLjY0LTguNzgsMTguNDhsNDguMjMtLjAyaC4wMVoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjQ0LjA1LDEzNy4wN2wtLjA1LDI3LjI1Yy0xMy4wNSwxLjItMjQuNTMsMS41MS0zNi41Ni0uNDctMTUuMzgtMi41My0yNS4xLTE0LjExLTI1LjE2LTI5LjhsLS4yNi02NC41Ny0xOC40Ny0uMjQtLjA4LTI3LjUyLDE4LjYtLjEyLS4wMi0yOC4zNCwzNy41LS4wNy0uMTYsMjguMjcsMjAuMjIuMjZjLjg1LDAsMi42My4yNywzLjIzLjYyLjc5LjQ1LDEuMjgsMi43LDEuMjcsMy43NWwtLjExLDIzLjE3LTI0LjQ0LjE4LjAyLDU1LjgyYzAsNC41LDIuNTcsOC40LDUuODYsMTAuOTYsNi4xMywxLjg1LDEwLjM1LDIsMTguNi44NGguMDFaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQxOC4yNCwxNjQuOTdsLTMzLjIxLS4zNC4wNy0xMjMuMDMsMzYuNjUuMTksMS4wNSwyMC4zOGM0LjgzLTkuMDYsNy44MS0xNS45NiwxNi40Mi0xOS4zOCw4LjgtMy40OSwxOC43Ny00LjAyLDI3Ljc4LTEuMTVsLS4wOCwzMWMtOS43OC0uODMtMTguMjQtMi41NS0yNy4wNS4xMS05Ljc3LDIuOTUtMTcuMzksMTEuNjYtMTcuNDIsMjIuMTlsLS4xNyw2Ni40MWMwLDEuMzctMi4zMiwzLjY0LTQuMDQsMy42MloiLz4KICA8L2c+CiAgPGc+CiAgICA8cGF0aCBkPSJNMTExLjM1LDEwNy45M2wzNy4zNi0uMThjLTEuMDIsMjYuNC0xNy42LDQ3LjM2LTQxLjQ2LDU2LjMyLTI5LjM0LDEwLjI3LTY2LjQ1LDUuNjUtODcuMjMtMTguMjctOC4zOC05LjY1LTEzLjk1LTIwLjc0LTE2Ljc4LTMzLjI2Qy00LjI4LDc5LjI2LjMsMzguOCwyNy40NCwxNi4yLDUwLjY2LTMuMTIsODkuNzgtNC45OCwxMTYuMDksOS42N2MxOS4zMSwxMC45MSwzMS44MywzMC4wNSwzMi41MSw1Mi43OGgtMzcuMjFjLTIuMDMtMTQuNzktMTEuNjQtMjYuMDctMjUuODctMjkuMjYtMTcuMS0zLjk1LTMzLjU0LDQuMjQtNDAuNDMsMjAuOTQtNy45LDE5LjE1LTcuOTYsNDIuMDUuMDgsNjEuMTcsNi41OSwxNS42OCwyMS41NiwyMy43NywzNy44LDIxLjQ3LDE0LjU3LTIuNTEsMjYuMTMtMTIuNTksMjguMzktMjguODNoMFoiLz4KICAgIDxwYXRoIGQ9Ik0yNzguMTgsMTI3LjgxYy05Ljg0LDM0Ljk5LTQ2LjcxLDQ2LTc5LjU3LDM3LjM0LTE3LjgzLTQuNy0zMS40Mi0xNy4xOS0zNy4yMS0zNC44LTUuMy0xNi4xMy01LjU5LTMzLjkxLTEuMDgtNTAuMzUsNS4zOS0xOS42NiwyMC40Ny0zNC4xNCw0MC4xLTM4LjgzLDMxLjM0LTcuNDgsNjUuNDgsMi43Myw3Ni42LDM0LjU4LDUuODUsMTYuNzYsNS45NywzNC45NSwxLjE2LDUyLjA1aDBaTTI0MC4wNCw4Mi45NWMtMy4zNi05LjQ4LTEwLjc4LTE1LjEyLTIwLjE3LTE1LjI5LTkuMTUtLjE3LTE3LjA4LDQuOTMtMjAuNzgsMTQuNDItNS4yOCwxMy41My01LjM0LDI5LjcuMTcsNDMuMjMsMy43Miw5LjEzLDExLjg1LDE0LjA5LDIwLjc0LDEzLjg5LDIzLjE2LS41MywyNy45OS0zMy44MywyMC4wNS01Ni4yNWgtLjAxWiIvPgogICAgPHBhdGggZD0iTTM2NC4xMyw3Mi4wMmMtNi4zLTMuNDgtMTQuODQtMy4zMy0yMC44NC0uMDctNy43NCw0LjE5LTEwLjc3LDEyLjI4LTExLjM5LDIwLjc0bC0uMDQsNzIuMjhoLTM3LjM0VjQxLjY2bDM3LjA1LS4wNy43OSwyMC4yOGM3LjkzLTE2LjA3LDIwLjY2LTIzLjI5LDM3LjI1LTIyLjg5LDEwLjk2LjI3LDIxLjczLDIuNDcsMjkuNTMsMTAuNyw4LjU4LDkuMDQsMTEsMjAuNzUsMTIuMDMsMzMuMjZsLjEsODIuMDRoLTM3LjY2bC0uMDUtNzYuNjhjLTEuMDQtNi40NS0zLjE0LTEyLjgxLTkuNDItMTYuMjloMFoiLz4KICAgIDxwYXRoIGQ9Ik00ODUuMDQsMTQwLjY3YzkuNi4yMywxOC4wMi0zLjQ2LDIyLjk0LTExLjUybDM0LjIzLS4wNmMtOC4yOSwzNC41Ni00NS45NSw0NC4yNS03Ny43MiwzNi4xNy0zNi44Ni05LjM4LTQ3LjgtNTAuMzctMzguMzktODUuMjIsNy4yNS0yNi44NiwzMC41Mi00MS4yOCw1Ny40NS00MS4yOSwyOC43Ni0uMDIsNTMuMjksMTcuMjIsNTguMTIsNDYuNzUsMS4zNyw4LjM5LDEuNTksMTcuMzMsMS42LDI2LjY5bC04My4yNS4wOWMtLjcxLDE1LjE0LDguNDMsMjguNywyNS4wMiwyOC40aDBaTTUwNy44MSw4OS42NmMtMS4xMS02LjMxLTIuNzQtMTEuNzItNi42LTE2LjE5LTYuNi03LjY1LTE3LjQ1LTkuNTItMjcuMDUtNS40LTcuNjQsMy4yNy0xMy44MiwxMi40NS0xMy41LDIxLjU4aDQ3LjE1WiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI2NjUuODUgMTY0LjkxIDYyNS4wMyAxNjUuMDMgNjAzLjMzIDEyNS4wOSA1ODEuNjMgMTY0Ljk4IDU0Mi42NiAxNjQuODEgNTgwLjAxIDEwNC4yIDU0Mi4yNSA0MS42MyA1ODQuNzUgNDEuNTcgNjA0Ljk5IDgyLjAzIDYyNS4zNyA0MS41NiA2NjUuOTkgNDEuNjIgNjI4LjA5IDEwMi42NyA2NjUuODUgMTY0LjkxIi8+CiAgICA8cGF0aCBkPSJNNzQ3LjMzLDEzNy4xN3YyNy4xYy0xMy40MywxLjc0LTI2LjYxLDEuOTYtMzkuNzgtMS4wNHMtMjEuNzQtMTIuNzEtMjEuODEtMjYuMThsLS4zOS02Ny40NC0xOC43Ni0uMzItLjA2LTI3LjU3LDE4LjgxLS4zMS0uMDYtMjguMzIsMzcuNTYuMDkuMDYsMjguMzQsMjQuNDEuMDguMDUsMjcuNzEtMjQuNTIuMjUuMSw1Ni4yNmMwLDQuOSwzLjMyLDguNjksNy4yNSwxMC45LDUuNzEsMS4wOSwxMC40NCwxLjE2LDE3LjE1LjQ1aDBaIi8+CiAgPC9nPgo8L3N2Zz4=" alt="ConextRouter"></div>
           </div>
           <div class="ct-row">
-            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r=".8" fill="currentColor"/></svg></div><span>Cara pilih model</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Manual, diatur sendiri melalui konfigurasi</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Manual, pilih model sendiri</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Manual atau routing otomatis dasar</span></div>
-            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Otomatis sesuai kompleksitas tugas</span></div>
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="6.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r=".8" fill="currentColor"/></svg></div><span data-i18n="why.r1.label">Cara pilih model</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r1.c1">Manual, diatur sendiri melalui konfigurasi</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r1.c2">Manual, pilih model sendiri</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r1.c3">Manual atau routing otomatis dasar</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="why.r1.c4">Otomatis sesuai kompleksitas tugas</span></div>
           </div>
           <div class="ct-row">
-            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2.5" y="6" width="15" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2" stroke="currentColor" stroke-width="1.5"/></svg></div><span>Mata uang &amp; harga</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Gratis, tetapi biaya infrastruktur ditanggung sendiri</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>USD + sekitar 5% biaya transaksi</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>USD, mulai US$49/bulan</span></div>
-            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Rupiah dengan harga yang transparan</span></div>
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2.5" y="6" width="15" height="8" rx="1.5" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="10" r="2" stroke="currentColor" stroke-width="1.5"/></svg></div><span data-i18n="why.r2.label">Mata uang &amp; harga</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r2.c1">Gratis, tetapi biaya infrastruktur ditanggung sendiri</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r2.c2">USD + sekitar 5% biaya transaksi</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r2.c3">USD, mulai US$49/bulan</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="why.r2.c4">Rupiah dengan harga yang transparan</span></div>
           </div>
           <div class="ct-row">
-            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2.5" y="5" width="15" height="10" rx="1.8" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 8.5h15" stroke="currentColor" stroke-width="1.5"/></svg></div><span>Metode bayar</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Kartu kredit langsung ke provider AI</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Kartu kredit internasional</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Kartu kredit atau invoice perusahaan</span></div>
-            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>QRIS, VA, atau e-wallet lokal</span></div>
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><rect x="2.5" y="5" width="15" height="10" rx="1.8" stroke="currentColor" stroke-width="1.5"/><path d="M2.5 8.5h15" stroke="currentColor" stroke-width="1.5"/></svg></div><span data-i18n="why.r3.label">Metode bayar</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r3.c1">Kartu kredit langsung ke provider AI</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r3.c2">Kartu kredit internasional</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r3.c3">Kartu kredit atau invoice perusahaan</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="why.r3.c4">QRIS, VA, atau e-wallet lokal</span></div>
           </div>
           <div class="ct-row">
-            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M6 14.5a3.5 3.5 0 01-.4-6.98A4.5 4.5 0 0114.9 8.6 3.25 3.25 0 0114.25 14.5H6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div><span>Setup &amp; infrastruktur</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Self-host, kelola server dan database sendiri</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Managed cloud, tanpa opsi penyimpanan data lokal</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Managed cloud dengan setup lebih kompleks</span></div>
-            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Terkelola, siap pakai, didukung Alibaba Cloud</span></div>
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><path d="M6 14.5a3.5 3.5 0 01-.4-6.98A4.5 4.5 0 0114.9 8.6 3.25 3.25 0 0114.25 14.5H6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div><span data-i18n="why.r4.label">Setup &amp; infrastruktur</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r4.c1">Self-host, kelola server dan database sendiri</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r4.c2">Managed cloud, tanpa opsi penyimpanan data lokal</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r4.c3">Managed cloud dengan setup lebih kompleks</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="why.r4.c4">Terkelola, siap pakai, didukung Alibaba Cloud</span></div>
           </div>
           <div class="ct-row">
-            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="6" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="15" cy="6" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="15" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M6.6 7.4L9 13.2M13.4 7.4L11 13.2M7 6h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><span>Ekosistem AI</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Berdiri sendiri, tanpa ekosistem produk lain</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Berdiri sendiri, tanpa integrasi ekosistem lokal</span></div>
-            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span>Bagian dari platform global, bukan ekosistem lokal</span></div>
-            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Terhubung ekosistem AI Ralali Group (AIRIN, ConextLab)</span></div>
+            <div class="ct-cell ct-label"><div class="ct-icon"><svg viewBox="0 0 20 20" fill="none"><circle cx="5" cy="6" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="15" cy="6" r="2" stroke="currentColor" stroke-width="1.5"/><circle cx="10" cy="15" r="2" stroke="currentColor" stroke-width="1.5"/><path d="M6.6 7.4L9 13.2M13.4 7.4L11 13.2M7 6h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div><span data-i18n="why.r5.label">Ekosistem AI</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r5.c1">Berdiri sendiri, tanpa ekosistem produk lain</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r5.c2">Berdiri sendiri, tanpa integrasi ekosistem lokal</span></div>
+            <div class="ct-cell"><span class="ct-mark m-dash"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span><span data-i18n="why.r5.c3">Bagian dari platform global, bukan ekosistem lokal</span></div>
+            <div class="ct-cell ct-highlight"><span class="ct-mark m-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3.5 8.2l3 3 6-6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span data-i18n="why.r5.c4">Terhubung ekosistem AI Ralali Group (AIRIN, ConextLab)</span></div>
           </div>
         </div>
       </div>
-      <p class="compare-note">Berdasarkan riset pola umum router/gateway AI global per Agustus 2026 — nama platform disamarkan.</p>
+      <p class="compare-note" data-i18n="why.note">Berdasarkan riset pola umum router/gateway AI global per Agustus 2026 — nama platform disamarkan.</p>
     </div>
   </section>
 
   <section class="how" id="cara-kerja">
     <div class="wrap">
       <div class="how-head">
-        <div class="p-eyebrow">Cara Kerja</div>
-        <h2>Mulai dalam tiga langkah</h2>
-        <p>Tanpa migrasi besar. Cukup sesuaikan integrasi dan lanjutkan dengan kode yang sudah ada.</p>
+        <div class="p-eyebrow" data-i18n="how.eyebrow">Cara Kerja</div>
+        <h2 data-i18n="how.title">Mulai dalam tiga langkah</h2>
+        <p data-i18n="how.desc">Tanpa migrasi besar. Cukup sesuaikan integrasi dan lanjutkan dengan kode yang sudah ada.</p>
       </div>
       <div class="steps">
         <div class="step">
-          <span class="circle">1</span><h4>Buat akun</h4><p>Daftar dan verifikasi email.</p>
+          <span class="circle">1</span><h4 data-i18n="how.s1.title">Buat akun</h4><p data-i18n="how.s1.desc">Daftar dan verifikasi email.</p>
           <div class="step-visual">
             <svg class="vis-icon" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3.2" stroke="currentColor" stroke-width="1.5"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             <div class="vis-bars"><span style="width:64px;"></span><span style="width:88px;"></span></div>
@@ -551,7 +582,7 @@
         </div>
         <div class="step-arrow" aria-hidden="true">→</div>
         <div class="step" style="transition-delay:.12s;">
-          <span class="circle">2</span><h4>Buat API key</h4><p>Atur limit pemakaian, lalu buat API key.</p>
+          <span class="circle">2</span><h4 data-i18n="how.s2.title">Buat API key</h4><p data-i18n="how.s2.desc">Atur limit pemakaian, lalu buat API key.</p>
           <div class="step-visual">
             <svg class="vis-icon" viewBox="0 0 20 20" fill="none"><circle cx="6.5" cy="13.5" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M8.6 11.4L15.5 4.5M13 7l2 2M15.5 4.5l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <div class="vis-key-name">CONEXTROUTER_API_KEY</div>
@@ -560,7 +591,7 @@
         </div>
         <div class="step-arrow" aria-hidden="true">→</div>
         <div class="step" style="transition-delay:.24s;">
-          <span class="circle">3</span><h4>Mulai kirim request</h4><p>Ganti base URL, lalu gunakan kode yang sudah ada.</p>
+          <span class="circle">3</span><h4 data-i18n="how.s3.title">Mulai kirim request</h4><p data-i18n="how.s3.desc">Ganti base URL, lalu gunakan kode yang sudah ada.</p>
           <div class="step-visual">
             <svg class="vis-icon" viewBox="0 0 20 20" fill="none"><path d="M17.5 2.5L2.5 8.8l5.8 2.4M17.5 2.5l-3.4 14.2-6-5.5M17.5 2.5L8.3 11.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             <div class="vis-code">
@@ -576,15 +607,15 @@
   <section class="solution">
     <div class="wrap">
       <div class="how-head">
-        <div class="p-eyebrow">Dashboard</div>
-        <h2>Pantau semuanya dari satu dashboard</h2>
-        <p>Lihat saldo, pemakaian, dan API key dalam satu tempat.</p>
+        <div class="p-eyebrow" data-i18n="dashsec.eyebrow">Dashboard</div>
+        <h2 data-i18n="dashsec.title">Pantau semuanya dari satu dashboard</h2>
+        <p data-i18n="dashsec.desc">Lihat saldo, pemakaian, dan API key dalam satu tempat.</p>
       </div>
       <div class="sol-frame">
         <div class="sol-bar">
           <div class="mock-dots"><span></span><span></span><span></span></div>
           <div class="mock-url">dashboard.conextrouter.id</div>
-          <span class="sol-live">Live</span>
+          <span class="sol-live" data-i18n="mock.live">Live</span>
         </div>
         <div class="sol-shot-wrap">
           <img class="sol-shot" src="images/dashboard-preview.jpg" alt="Tampilan dashboard ConextRouter — saldo, pemakaian, dan API key dalam satu layar" loading="lazy">
@@ -596,23 +627,23 @@
   <section class="services" id="produk">
     <div class="wrap">
       <div class="how-head">
-        <div class="p-eyebrow">Produk</div>
-        <h2>Satu platform untuk berbagai skala</h2>
-        <p>Pilih skema penggunaan sesuai kebutuhan, dari developer individu hingga tim perusahaan.</p>
+        <div class="p-eyebrow" data-i18n="prod.eyebrow">Produk</div>
+        <h2 data-i18n="prod.title">Satu platform untuk berbagai skala</h2>
+        <p data-i18n="prod.desc">Pilih skema penggunaan sesuai kebutuhan, dari developer individu hingga tim perusahaan.</p>
       </div>
 
       <div class="prod-row">
         <div class="prod-text">
-          <div class="svc-tag">Personal</div>
-          <h3>Untuk Developer Individu</h3>
-          <p class="svc-desc">Akses berbagai model AI lewat satu API key tanpa perlu mendaftar ke setiap provider. Cukup top up saldo, buat API key, lalu mulai kirim request. Cocok untuk developer individu, tim kecil, dan side project.</p>
+          <div class="svc-tag" data-i18n="prod.p1.tag">Personal</div>
+          <h3 data-i18n="prod.p1.h3">Untuk Developer Individu</h3>
+          <p class="svc-desc" data-i18n="prod.p1.desc">Akses berbagai model AI lewat satu API key tanpa perlu mendaftar ke setiap provider. Cukup top up saldo, buat API key, lalu mulai kirim request. Cocok untuk developer individu, tim kecil, dan side project.</p>
           <ul class="svc-list">
-            <li>Satu API key untuk mengakses berbagai model AI</li>
-            <li>Top up mulai Rp50.000 via QRIS, VA, atau e-wallet</li>
-            <li>Routing otomatis sesuai kompleksitas setiap request</li>
-            <li>Buat beberapa API key sesuai kebutuhan</li>
+            <li data-i18n="prod.p1.li1">Satu API key untuk mengakses berbagai model AI</li>
+            <li data-i18n="prod.p1.li2">Top up mulai Rp50.000 via QRIS, VA, atau e-wallet</li>
+            <li data-i18n="prod.p1.li3">Routing otomatis sesuai kompleksitas setiap request</li>
+            <li data-i18n="prod.p1.li4">Buat beberapa API key sesuai kebutuhan</li>
           </ul>
-          <a href="#harga" class="btn btn-dark">Buat Akun Gratis</a>
+          <a href="#harga" class="btn btn-dark" data-i18n="hero.cta1">Buat Akun Gratis</a>
         </div>
         <div class="prod-visual">
           <div class="prod-card">
@@ -620,26 +651,26 @@
               <div style="display:flex;align-items:center;gap:10px;">
                 <div class="dash-avatar"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7.2" r="3.2" fill="rgba(255,255,255,.92)"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="rgba(255,255,255,.92)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
                 <div>
-                  <div class="pc-val" style="font-size:13.5px;">Workspace Personal</div>
-                  <div class="pc-lbl" style="margin-top:2px;">1 pengguna</div>
+                  <div class="pc-val" style="font-size:13.5px;" data-i18n="prod.p1.mock.workspace">Workspace Personal</div>
+                  <div class="pc-lbl" style="margin-top:2px;" data-i18n="prod.p1.mock.users">1 pengguna</div>
                 </div>
               </div>
-              <span class="mock-tag">Aktif</span>
+              <span class="mock-tag" data-i18n="mock.aktif">Aktif</span>
             </div>
             <div class="pc-row">
-              <span class="pc-lbl">Routing Model</span>
-              <span class="mock-tag" style="background:var(--accent-soft);color:var(--accent);">Otomatis</span>
+              <span class="pc-lbl" data-i18n="prod.p1.mock.routing_label">Routing Model</span>
+              <span class="mock-tag" style="background:var(--accent-soft);color:var(--accent);" data-i18n="mock.otomatis">Otomatis</span>
             </div>
             <div class="route-row">
-              <div class="task">Pertanyaan singkat &amp; cepat</div>
+              <div class="task" data-i18n="prod.p1.route1">Pertanyaan singkat &amp; cepat</div>
               <div class="route-model">Qwen-Flash</div>
             </div>
             <div class="route-row">
-              <div class="task">Tugas harian, kompleksitas sedang</div>
+              <div class="task" data-i18n="prod.p1.route2">Tugas harian, kompleksitas sedang</div>
               <div class="route-model">Qwen-Plus</div>
             </div>
             <div class="route-row">
-              <div class="task">Reasoning &amp; analisis berat</div>
+              <div class="task" data-i18n="prod.p1.route3">Reasoning &amp; analisis berat</div>
               <div class="route-model">Qwen-Max</div>
             </div>
           </div>
@@ -648,22 +679,22 @@
 
       <div class="prod-row rev">
         <div class="prod-text">
-          <div class="svc-tag">Enterprise · Postpaid</div>
-          <h3>Untuk Tim &amp; Perusahaan</h3>
-          <p class="svc-desc">Kelola pemakaian AI seluruh tim dengan skema postpaid. Penggunaan dihitung berdasarkan token dan ditagih melalui satu invoice bulanan, dengan akses dan budget yang dapat diatur untuk setiap user atau tim.</p>
+          <div class="svc-tag" data-i18n="prod.p2.tag">Enterprise · Postpaid</div>
+          <h3 data-i18n-html="prod.p2.h3">Untuk Tim &amp; Perusahaan</h3>
+          <p class="svc-desc" data-i18n="prod.p2.desc">Kelola pemakaian AI seluruh tim dengan skema postpaid. Penggunaan dihitung berdasarkan token dan ditagih melalui satu invoice bulanan, dengan akses dan budget yang dapat diatur untuk setiap user atau tim.</p>
           <ul class="svc-list">
-            <li>Seluruh pemakaian tim dalam satu invoice bulanan</li>
-            <li>Atur role dan budget per user atau tim</li>
-            <li>Sesuaikan limit kredit dengan kebutuhan perusahaan</li>
-            <li>SLA dan dukungan teknis prioritas</li>
+            <li data-i18n="prod.p2.li1">Seluruh pemakaian tim dalam satu invoice bulanan</li>
+            <li data-i18n="prod.p2.li2">Atur role dan budget per user atau tim</li>
+            <li data-i18n="prod.p2.li3">Sesuaikan limit kredit dengan kebutuhan perusahaan</li>
+            <li data-i18n="prod.p2.li4">SLA dan dukungan teknis prioritas</li>
           </ul>
-          <a href="#harga" class="btn btn-light">Ajukan Enterprise</a>
+          <a href="#harga" class="btn btn-light" data-i18n="prod.p2.cta">Ajukan Enterprise</a>
         </div>
         <div class="prod-visual">
           <div class="prod-card dark">
             <div class="pc-row" style="border-top:none;">
-              <span class="pc-lbl">Pemakaian Bulan Ini</span>
-              <span class="mock-tag">Live</span>
+              <span class="pc-lbl" data-i18n="prod.p2.mock.usage_label">Pemakaian Bulan Ini</span>
+              <span class="mock-tag" data-i18n="mock.live">Live</span>
             </div>
             <div class="pc-big">Rp 18,4 Jt</div>
             <div class="team-avatars">
@@ -672,8 +703,8 @@
               <div class="team-avatar">MP</div>
               <div class="team-avatar">+9</div>
             </div>
-            <div class="pc-row"><span class="pc-lbl">Anggota Tim</span><span class="pc-val">12 users</span></div>
-            <div class="pc-row"><span class="pc-lbl">Invoice Terakhir</span><span class="pc-val">#INV-0842 · Lunas</span></div>
+            <div class="pc-row"><span class="pc-lbl" data-i18n="prod.p2.mock.members_label">Anggota Tim</span><span class="pc-val" data-i18n="prod.p2.mock.members_value">12 users</span></div>
+            <div class="pc-row"><span class="pc-lbl" data-i18n="prod.p2.mock.invoice_label">Invoice Terakhir</span><span class="pc-val" data-i18n="prod.p2.mock.invoice_value">#INV-0842 · Lunas</span></div>
           </div>
         </div>
       </div>
@@ -683,39 +714,39 @@
   <section class="pricing" id="harga">
     <div class="wrap">
       <div class="price-head">
-        <div class="p-eyebrow">Harga</div>
-        <h2>Pilih skema sesuai kebutuhan</h2>
-        <p>Mulai dengan Personal, lalu beralih ke Enterprise saat kebutuhan tim berkembang.</p>
+        <div class="p-eyebrow" data-i18n="price.eyebrow">Harga</div>
+        <h2 data-i18n="price.title">Pilih skema sesuai kebutuhan</h2>
+        <p data-i18n="price.desc">Mulai dengan Personal, lalu beralih ke Enterprise saat kebutuhan tim berkembang.</p>
       </div>
       <div class="svc-grid">
         <div class="svc-card">
-          <div class="svc-tag">Personal</div>
-          <h3>Untuk Developer Individu</h3>
-          <div class="price-value">Top up mulai Rp50.000</div>
-          <div class="price-sub">Bayar sesuai pemakaian</div>
+          <div class="svc-tag" data-i18n="prod.p1.tag">Personal</div>
+          <h3 data-i18n="prod.p1.h3">Untuk Developer Individu</h3>
+          <div class="price-value" data-i18n="price.personal.value">Top up mulai Rp50.000</div>
+          <div class="price-sub" data-i18n="price.personal.sub">Bayar sesuai pemakaian</div>
           <ul class="svc-list">
-            <li>Akses berbagai model AI melalui satu API key</li>
-            <li>Top up via QRIS, VA, atau e-wallet</li>
-            <li>Routing otomatis sesuai kompleksitas tugas</li>
-            <li>Buat beberapa API key sesuai kebutuhan</li>
-            <li>Tanpa kontrak atau biaya langganan bulanan</li>
+            <li data-i18n="price.personal.li1">Akses berbagai model AI melalui satu API key</li>
+            <li data-i18n="price.personal.li2">Top up via QRIS, VA, atau e-wallet</li>
+            <li data-i18n="price.personal.li3">Routing otomatis sesuai kompleksitas tugas</li>
+            <li data-i18n="price.personal.li4">Buat beberapa API key sesuai kebutuhan</li>
+            <li data-i18n="price.personal.li5">Tanpa kontrak atau biaya langganan bulanan</li>
           </ul>
-          <a href="#" class="btn btn-dark">Buat Akun Gratis</a>
+          <a href="#" class="btn btn-dark" data-i18n="hero.cta1">Buat Akun Gratis</a>
         </div>
         <div class="svc-card dark" style="transition-delay:.1s;">
-          <span class="price-badge"><svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2l1.8 5.2L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.8z"/></svg>Rekomendasi</span>
-          <div class="svc-tag">Enterprise</div>
-          <h3>Untuk Tim &amp; Perusahaan</h3>
-          <div class="price-value">Custom</div>
-          <div class="price-sub">Ditagih bulanan lewat satu invoice</div>
+          <span class="price-badge"><svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2l1.8 5.2L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.8z"/></svg><span data-i18n="price.badge">Rekomendasi</span></span>
+          <div class="svc-tag" data-i18n="price.ent.tag">Enterprise</div>
+          <h3 data-i18n-html="prod.p2.h3">Untuk Tim &amp; Perusahaan</h3>
+          <div class="price-value" data-i18n="price.ent.value">Custom</div>
+          <div class="price-sub" data-i18n="price.ent.sub">Ditagih bulanan lewat satu invoice</div>
           <ul class="svc-list">
-            <li>Semua fitur Personal untuk seluruh tim</li>
-            <li>Satu invoice bulanan tanpa top up manual</li>
-            <li>Atur role dan budget per user atau tim</li>
-            <li>Limit kredit sesuai skala perusahaan</li>
-            <li>SLA dan dukungan teknis prioritas</li>
+            <li data-i18n="price.ent.li1">Semua fitur Personal untuk seluruh tim</li>
+            <li data-i18n="price.ent.li2">Satu invoice bulanan tanpa top up manual</li>
+            <li data-i18n="price.ent.li3">Atur role dan budget per user atau tim</li>
+            <li data-i18n="price.ent.li4">Limit kredit sesuai skala perusahaan</li>
+            <li data-i18n="price.ent.li5">SLA dan dukungan teknis prioritas</li>
           </ul>
-          <a href="#" class="btn btn-light">Ajukan Enterprise</a>
+          <a href="#" class="btn btn-light" data-i18n="prod.p2.cta">Ajukan Enterprise</a>
         </div>
       </div>
     </div>
@@ -724,29 +755,29 @@
   <section class="faq" id="faq">
     <div class="wrap faq-grid">
       <div>
-        <h2>FAQ</h2>
-        <p>Jawaban singkat tentang model, pembayaran, routing, dan integrasi.</p>
+        <h2 data-i18n="faq.h2">FAQ</h2>
+        <p data-i18n="faq.desc">Jawaban singkat tentang model, pembayaran, routing, dan integrasi.</p>
       </div>
       <div>
         <details open>
-          <summary>Apa itu ConextRouter?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
-          <p>Gateway API yang menghubungkan aplikasimu ke berbagai model AI lewat satu API key.</p>
+          <summary><span data-i18n="faq.q1">Apa itu ConextRouter?</span><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p data-i18n="faq.a1">Gateway API yang menghubungkan aplikasimu ke berbagai model AI lewat satu API key.</p>
         </details>
         <details>
-          <summary>Model AI apa yang tersedia?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
-          <p>Tersedia berbagai model dari OpenAI, Google Gemini, Anthropic Claude, Alibaba Qwen, DeepSeek, dan provider lainnya. Daftar model akan terus diperbarui.</p>
+          <summary><span data-i18n="faq.q2">Model AI apa yang tersedia?</span><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p data-i18n="faq.a2">Tersedia berbagai model dari OpenAI, Google Gemini, Anthropic Claude, Alibaba Qwen, DeepSeek, dan provider lainnya. Daftar model akan terus diperbarui.</p>
         </details>
         <details>
-          <summary>Bagaimana ConextRouter memilih model AI?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
-          <p>Sistem menilai kompleksitas setiap request lalu mengarahkannya ke model yang sesuai. Tugas sederhana menggunakan model yang lebih ringan, sedangkan tugas kompleks diarahkan ke model dengan kemampuan reasoning lebih tinggi.</p>
+          <summary><span data-i18n="faq.q3">Bagaimana ConextRouter memilih model AI?</span><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p data-i18n="faq.a3">Sistem menilai kompleksitas setiap request lalu mengarahkannya ke model yang sesuai. Tugas sederhana menggunakan model yang lebih ringan, sedangkan tugas kompleks diarahkan ke model dengan kemampuan reasoning lebih tinggi.</p>
         </details>
         <details>
-          <summary>Bagaimana cara bayar?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
-          <p>Personal dapat top up melalui QRIS, VA, atau e-wallet. Untuk Enterprise tersedia skema tagihan bulanan.</p>
+          <summary><span data-i18n="faq.q4">Bagaimana cara bayar?</span><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p data-i18n="faq.a4">Personal dapat top up melalui QRIS, VA, atau e-wallet. Untuk Enterprise tersedia skema tagihan bulanan.</p>
         </details>
         <details>
-          <summary>Apakah perlu banyak perubahan kode?<span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
-          <p>ConextRouter kompatibel dengan format OpenAI dan Anthropic. Pada banyak kasus, cukup ganti base URL.</p>
+          <summary><span data-i18n="faq.q5">Apakah perlu banyak perubahan kode?</span><span class="chev"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span></summary>
+          <p data-i18n="faq.a5">ConextRouter kompatibel dengan format OpenAI dan Anthropic. Pada banyak kasus, cukup ganti base URL.</p>
         </details>
       </div>
     </div>
@@ -758,11 +789,11 @@
         <div class="cloud" style="width:300px;height:120px;top:-30px;left:10%"></div>
         <div class="cloud" style="width:260px;height:100px;top:20px;right:5%"></div>
         <div class="final-inner">
-          <h2>Siap mulai dengan ConextRouter?</h2>
-          <p>Buat akun gratis. Saat kebutuhan tim berkembang, beralih ke Enterprise kapan saja.</p>
+          <h2 data-i18n="final.title">Siap mulai dengan ConextRouter?</h2>
+          <p data-i18n="final.desc">Buat akun gratis. Saat kebutuhan tim berkembang, beralih ke Enterprise kapan saja.</p>
           <div class="hero-ctas">
-            <a href="#produk" class="btn btn-dark">Buat Akun Gratis</a>
-            <a href="#harga" class="btn btn-light">Ajukan Enterprise</a>
+            <a href="#produk" class="btn btn-dark" data-i18n="hero.cta1">Buat Akun Gratis</a>
+            <a href="#harga" class="btn btn-light" data-i18n="prod.p2.cta">Ajukan Enterprise</a>
           </div>
         </div>
       </div>
@@ -777,25 +808,25 @@
         <a href="#top" class="brand">
           <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNDY3IDE2OS4yMSI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjYuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS40IEJ1aWxkIDEwOSkgIC0tPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuc3QwIHsKICAgICAgICBmaWxsOiAjMTc1MmVkOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04ODkuNTksMTY0Ljk4bC0zNC43OS0uMjUtMjguMTMtNTYuNzVoLTIzLjQ4bC4wNSw1My40MmMwLDEuMTctMi4zMiwzLjUtMy41NCwzLjVsLTMzLjY2LS4wMy0xLjI1LTEwLjc5LjA1LTE0OS44NSw3Ni40NC4yMmM5LjU1LjAzLDE4LjU3LDMuNDMsMjYuODgsNi45OSw5LjM5LDUuMDcsMTYuMjQsMTEuOTksMjAuNjksMjEuNzEsMTAuMywyNi4xMSwzLjE4LDU3LjI5LTIzLjM2LDY5LjA5bDMyLjA0LDYxLjZjLTEuOTEuNDktNS4zOCwxLjE2LTcuOTUsMS4xNGgwWk04NTMuOTcsNTYuODVjLjU3LTE0LjI1LTEwLjMzLTIzLjIzLTIzLjQxLTIzLjE4bC0yNy4zNS4xdjQ3LjEzbDMwLjkyLS4yOGMxMi40NS0uMTEsMjAuNzctMTEuMzYsMTkuODMtMjMuNzZoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIwLjk5LDEzMC41M2MtMTEuMTksMzMuNDQtNDcuOTIsNDMuMDUtNzkuNzIsMzQuMTEtMzYuOTgtMTAuMzktNDYuOTMtNTIuOTctMzYuMjgtODYuNzUsMTEuMzYtMzYuMDYsNTIuNDUtNDYuNDUsODQuODEtMzQuMTIsMzMuOSwxMi45Miw0MS45OCw1NC41LDMxLjE4LDg2Ljc1aC4wMVpNOTg0LjAxLDgyLjk1Yy0zLjQ4LTEwLjAyLTExLjI5LTE1LjU0LTIwLjk3LTE1LjQ4cy0xNi45Niw1LjQtMjAuNDcsMTVjLTguMTQsMjIuMjUtMy4zMSw1NywyMC40OCw1Ni44NiwyNC40Ni0uMTQsMjguNy0zNC4xMiwyMC45Ni01Ni4zOGgwWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTMuODgsNDEuNjNsLS4wNCwxMjIuODMtMzcuMDEuNDktMS4wNS0xOS44OWMtOC4xMiwxNi41NC0yMS41OCwyMi45My0zOC4yOSwyMi42NS0yNi44Ni0uNDQtMzkuMTctMTguMzUtNDAuMDMtNDQuNTlsLS4wNS04MS4zMywzNy4xMy0uMTIuMTMsNzMuNTdjMCwzLjgyLDEuMDEsOC4zOCwyLjI0LDExLjQ0LDMuMTQsNy44LDkuOTIsMTAuNjgsMTcuNjIsMTAuNzEsMTEuODUuMDQsMjAuMDktNy40MiwyMS45NS0xOS41MmwuMDktNzUuOTksMzcuMzItLjIzdi0uMDJaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI5OS4xNCwxMzYuNjZjOS40NCw3LjM0LDI5Ljk1LDUuNjIsMzguNDEtNy41NWwzMy4yNy4wNGMtOC4wMywzMy44OC00NC43OSw0My43My03Ni4xNCwzNi4yNy0xOC44OS00LjUtMzMuMjEtMTguMDUtMzguOTgtMzYuNTMtOS43Ny0zMS4yNy0xLjcxLTcxLjQxLDI5Ljg5LTg0LjY3LDE2LjcxLTcuMDEsMzYuMjEtNy4wNiw1Mi44Ny0uMTQsMjcuMywxMS4zNCwzNS40NCwzOS40MiwzMy4xNyw2OC4xbC04Mi45NC4xMWMtLjMyLDkuNDcsMi45NywxOC41NSwxMC40NSwyNC4zN2gwWk0xMzM3LjA2LDg5LjcxYy0xLjc0LTcuODMtNC4wNi0xNC45OC0xMC41MS0xOS42My04LjMzLTYuMDEtMjEuMDYtNS42OS0yOC45NSwxLjE3LTUuNDUsNC43NC03LjgzLDExLjY0LTguNzgsMTguNDhsNDguMjMtLjAyaC4wMVoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjQ0LjA1LDEzNy4wN2wtLjA1LDI3LjI1Yy0xMy4wNSwxLjItMjQuNTMsMS41MS0zNi41Ni0uNDctMTUuMzgtMi41My0yNS4xLTE0LjExLTI1LjE2LTI5LjhsLS4yNi02NC41Ny0xOC40Ny0uMjQtLjA4LTI3LjUyLDE4LjYtLjEyLS4wMi0yOC4zNCwzNy41LS4wNy0uMTYsMjguMjcsMjAuMjIuMjZjLjg1LDAsMi42My4yNywzLjIzLjYyLjc5LjQ1LDEuMjgsMi43LDEuMjcsMy43NWwtLjExLDIzLjE3LTI0LjQ0LjE4LjAyLDU1LjgyYzAsNC41LDIuNTcsOC40LDUuODYsMTAuOTYsNi4xMywxLjg1LDEwLjM1LDIsMTguNi44NGguMDFaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQxOC4yNCwxNjQuOTdsLTMzLjIxLS4zNC4wNy0xMjMuMDMsMzYuNjUuMTksMS4wNSwyMC4zOGM0LjgzLTkuMDYsNy44MS0xNS45NiwxNi40Mi0xOS4zOCw4LjgtMy40OSwxOC43Ny00LjAyLDI3Ljc4LTEuMTVsLS4wOCwzMWMtOS43OC0uODMtMTguMjQtMi41NS0yNy4wNS4xMS05Ljc3LDIuOTUtMTcuMzksMTEuNjYtMTcuNDIsMjIuMTlsLS4xNyw2Ni40MWMwLDEuMzctMi4zMiwzLjY0LTQuMDQsMy42MloiLz4KICA8L2c+CiAgPGc+CiAgICA8cGF0aCBkPSJNMTExLjM1LDEwNy45M2wzNy4zNi0uMThjLTEuMDIsMjYuNC0xNy42LDQ3LjM2LTQxLjQ2LDU2LjMyLTI5LjM0LDEwLjI3LTY2LjQ1LDUuNjUtODcuMjMtMTguMjctOC4zOC05LjY1LTEzLjk1LTIwLjc0LTE2Ljc4LTMzLjI2Qy00LjI4LDc5LjI2LjMsMzguOCwyNy40NCwxNi4yLDUwLjY2LTMuMTIsODkuNzgtNC45OCwxMTYuMDksOS42N2MxOS4zMSwxMC45MSwzMS44MywzMC4wNSwzMi41MSw1Mi43OGgtMzcuMjFjLTIuMDMtMTQuNzktMTEuNjQtMjYuMDctMjUuODctMjkuMjYtMTcuMS0zLjk1LTMzLjU0LDQuMjQtNDAuNDMsMjAuOTQtNy45LDE5LjE1LTcuOTYsNDIuMDUuMDgsNjEuMTcsNi41OSwxNS42OCwyMS41NiwyMy43NywzNy44LDIxLjQ3LDE0LjU3LTIuNTEsMjYuMTMtMTIuNTksMjguMzktMjguODNoMFoiLz4KICAgIDxwYXRoIGQ9Ik0yNzguMTgsMTI3LjgxYy05Ljg0LDM0Ljk5LTQ2LjcxLDQ2LTc5LjU3LDM3LjM0LTE3LjgzLTQuNy0zMS40Mi0xNy4xOS0zNy4yMS0zNC44LTUuMy0xNi4xMy01LjU5LTMzLjkxLTEuMDgtNTAuMzUsNS4zOS0xOS42NiwyMC40Ny0zNC4xNCw0MC4xLTM4LjgzLDMxLjM0LTcuNDgsNjUuNDgsMi43Myw3Ni42LDM0LjU4LDUuODUsMTYuNzYsNS45NywzNC45NSwxLjE2LDUyLjA1aDBaTTI0MC4wNCw4Mi45NWMtMy4zNi05LjQ4LTEwLjc4LTE1LjEyLTIwLjE3LTE1LjI5LTkuMTUtLjE3LTE3LjA4LDQuOTMtMjAuNzgsMTQuNDItNS4yOCwxMy41My01LjM0LDI5LjcuMTcsNDMuMjMsMy43Miw5LjEzLDExLjg1LDE0LjA5LDIwLjc0LDEzLjg5LDIzLjE2LS41MywyNy45OS0zMy44MywyMC4wNS01Ni4yNWgtLjAxWiIvPgogICAgPHBhdGggZD0iTTM2NC4xMyw3Mi4wMmMtNi4zLTMuNDgtMTQuODQtMy4zMy0yMC44NC0uMDctNy43NCw0LjE5LTEwLjc3LDEyLjI4LTExLjM5LDIwLjc0bC0uMDQsNzIuMjhoLTM3LjM0VjQxLjY2bDM3LjA1LS4wNy43OSwyMC4yOGM3LjkzLTE2LjA3LDIwLjY2LTIzLjI5LDM3LjI1LTIyLjg5LDEwLjk2LjI3LDIxLjczLDIuNDcsMjkuNTMsMTAuNyw4LjU4LDkuMDQsMTEsMjAuNzUsMTIuMDMsMzMuMjZsLjEsODIuMDRoLTM3LjY2bC0uMDUtNzYuNjhjLTEuMDQtNi40NS0zLjE0LTEyLjgxLTkuNDItMTYuMjloMFoiLz4KICAgIDxwYXRoIGQ9Ik00ODUuMDQsMTQwLjY3YzkuNi4yMywxOC4wMi0zLjQ2LDIyLjk0LTExLjUybDM0LjIzLS4wNmMtOC4yOSwzNC41Ni00NS45NSw0NC4yNS03Ny43MiwzNi4xNy0zNi44Ni05LjM4LTQ3LjgtNTAuMzctMzguMzktODUuMjIsNy4yNS0yNi44NiwzMC41Mi00MS4yOCw1Ny40NS00MS4yOSwyOC43Ni0uMDIsNTMuMjksMTcuMjIsNTguMTIsNDYuNzUsMS4zNyw4LjM5LDEuNTksMTcuMzMsMS42LDI2LjY5bC04My4yNS4wOWMtLjcxLDE1LjE0LDguNDMsMjguNywyNS4wMiwyOC40aDBaTTUwNy44MSw4OS42NmMtMS4xMS02LjMxLTIuNzQtMTEuNzItNi42LTE2LjE5LTYuNi03LjY1LTE3LjQ1LTkuNTItMjcuMDUtNS40LTcuNjQsMy4yNy0xMy44MiwxMi40NS0xMy41LDIxLjU4aDQ3LjE1WiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI2NjUuODUgMTY0LjkxIDYyNS4wMyAxNjUuMDMgNjAzLjMzIDEyNS4wOSA1ODEuNjMgMTY0Ljk4IDU0Mi42NiAxNjQuODEgNTgwLjAxIDEwNC4yIDU0Mi4yNSA0MS42MyA1ODQuNzUgNDEuNTcgNjA0Ljk5IDgyLjAzIDYyNS4zNyA0MS41NiA2NjUuOTkgNDEuNjIgNjI4LjA5IDEwMi42NyA2NjUuODUgMTY0LjkxIi8+CiAgICA8cGF0aCBkPSJNNzQ3LjMzLDEzNy4xN3YyNy4xYy0xMy40MywxLjc0LTI2LjYxLDEuOTYtMzkuNzgtMS4wNHMtMjEuNzQtMTIuNzEtMjEuODEtMjYuMThsLS4zOS02Ny40NC0xOC43Ni0uMzItLjA2LTI3LjU3LDE4LjgxLS4zMS0uMDYtMjguMzIsMzcuNTYuMDkuMDYsMjguMzQsMjQuNDEuMDguMDUsMjcuNzEtMjQuNTIuMjUuMSw1Ni4yNmMwLDQuOSwzLjMyLDguNjksNy4yNSwxMC45LDUuNzEsMS4wOSwxMC40NCwxLjE2LDE3LjE1LjQ1aDBaIi8+CiAgPC9nPgo8L3N2Zz4=" alt="ConextRouter" style="height:20px;width:auto;object-fit:contain;">
         </a>
-        <p>Gateway API AI dari Ralali.</p>
+        <p data-i18n="footer.tagline">Gateway API AI dari Ralali.</p>
       </div>
       <div class="foot-col">
-        <h5>Produk</h5>
-        <ul><li><a href="#produk">Personal</a></li><li><a href="#produk">Enterprise</a></li></ul>
+        <h5 data-i18n="footer.col1.title">Produk</h5>
+        <ul><li><a href="#produk" data-i18n="prod.p1.tag">Personal</a></li><li><a href="#produk" data-i18n="price.ent.tag">Enterprise</a></li></ul>
       </div>
       <div class="foot-col">
-        <h5>Developer</h5>
-        <ul><li><a href="#">Dokumentasi</a></li><li><a href="#">Status</a></li></ul>
+        <h5 data-i18n="footer.col2.title">Developer</h5>
+        <ul><li><a href="docs.html" data-i18n="nav.docs">Dokumentasi</a></li><li><a href="#" data-i18n="footer.status">Status</a></li></ul>
       </div>
       <div class="foot-col">
-        <h5>Perusahaan</h5>
-        <ul><li><a href="#">Tentang</a></li><li><a href="#">Kontak</a></li></ul>
+        <h5 data-i18n="footer.col3.title">Perusahaan</h5>
+        <ul><li><a href="#" data-i18n="footer.tentang">Tentang</a></li><li><a href="#" data-i18n="footer.kontak">Kontak</a></li></ul>
       </div>
     </div>
     <div class="foot-bottom">
-      <p>© 2026 ConextRouter. Seluruh hak cipta dilindungi.</p>
+      <p data-i18n="footer.copyright">© 2026 ConextRouter. Seluruh hak cipta dilindungi.</p>
       <div class="powered-badge">
-        <span>Powered by</span>
+        <span data-i18n="footer.powered_by">Powered by</span>
         <img src="images/ralalgroup.svg" alt="Ralali" class="powered-logo ralali">
         <span class="powered-divider"></span>
         <img src="images/AlibabaCloudLogo.svg" alt="Alibaba Cloud" class="powered-logo alibaba">
@@ -824,11 +855,200 @@
   targets.forEach(function(s){ io.observe(s); });
 })();
 
+</script>
+<script>
+var CR_I18N = {
+id: {
+"nav.produk":"Produk","nav.cara_kerja":"Cara Kerja","nav.faq":"FAQ","nav.docs":"Dokumentasi","nav.masuk":"Masuk",
+"hero.eyebrow":"Didukung","hero.title":"Satu API.<br>Semua model AI.","hero.lead":"Top up saldo, buat API key, lalu langsung pakai. ConextRouter otomatis memilih model yang paling sesuai untuk setiap request, jadi kamu bisa fokus membangun produk.","hero.cta1":"Buat Akun Gratis","hero.cta2":"Lihat Cara Kerja",
+"mock.dashboard_title":"Dashboard","mock.saldo":"Saldo Aktif","mock.token":"Token Terpakai","mock.apikeys":"API Keys Aktif","mock.live":"Live","mock.aktif":"Aktif","mock.otomatis":"Otomatis",
+"why.eyebrow":"Kenapa ConextRouter","why.title":"Apa bedanya dengan router AI lain?","why.desc":"Banyak router AI dirancang untuk pasar global. ConextRouter dibuat lebih praktis untuk kebutuhan pengguna di Indonesia.",
+"why.col1":"Router<br>Self-Host","why.col2":"Router<br>Marketplace Global","why.col3":"Router<br>Enterprise Global",
+"why.r1.label":"Cara pilih model","why.r1.c1":"Manual, diatur sendiri melalui konfigurasi","why.r1.c2":"Manual, pilih model sendiri","why.r1.c3":"Manual atau routing otomatis dasar","why.r1.c4":"Otomatis sesuai kompleksitas tugas",
+"why.r2.label":"Mata uang & harga","why.r2.c1":"Gratis, tetapi biaya infrastruktur ditanggung sendiri","why.r2.c2":"USD + sekitar 5% biaya transaksi","why.r2.c3":"USD, mulai US$49/bulan","why.r2.c4":"Rupiah dengan harga yang transparan",
+"why.r3.label":"Metode bayar","why.r3.c1":"Kartu kredit langsung ke provider AI","why.r3.c2":"Kartu kredit internasional","why.r3.c3":"Kartu kredit atau invoice perusahaan","why.r3.c4":"QRIS, VA, atau e-wallet lokal",
+"why.r4.label":"Setup & infrastruktur","why.r4.c1":"Self-host, kelola server dan database sendiri","why.r4.c2":"Managed cloud, tanpa opsi penyimpanan data lokal","why.r4.c3":"Managed cloud dengan setup lebih kompleks","why.r4.c4":"Terkelola, siap pakai, didukung Alibaba Cloud",
+"why.r5.label":"Ekosistem AI","why.r5.c1":"Berdiri sendiri, tanpa ekosistem produk lain","why.r5.c2":"Berdiri sendiri, tanpa integrasi ekosistem lokal","why.r5.c3":"Bagian dari platform global, bukan ekosistem lokal","why.r5.c4":"Terhubung ekosistem AI Ralali Group (AIRIN, ConextLab)",
+"why.note":"Berdasarkan riset pola umum router/gateway AI global per Agustus 2026 — nama platform disamarkan.",
+"how.eyebrow":"Cara Kerja","how.title":"Mulai dalam tiga langkah","how.desc":"Tanpa migrasi besar. Cukup sesuaikan integrasi dan lanjutkan dengan kode yang sudah ada.",
+"how.s1.title":"Buat akun","how.s1.desc":"Daftar dan verifikasi email.",
+"how.s2.title":"Buat API key","how.s2.desc":"Atur limit pemakaian, lalu buat API key.",
+"how.s3.title":"Mulai kirim request","how.s3.desc":"Ganti base URL, lalu gunakan kode yang sudah ada.",
+"dashsec.eyebrow":"Dashboard","dashsec.title":"Pantau semuanya dari satu dashboard","dashsec.desc":"Lihat saldo, pemakaian, dan API key dalam satu tempat.",
+"prod.eyebrow":"Produk","prod.title":"Satu platform untuk berbagai skala","prod.desc":"Pilih skema penggunaan sesuai kebutuhan, dari developer individu hingga tim perusahaan.",
+"prod.p1.tag":"Personal","prod.p1.h3":"Untuk Developer Individu","prod.p1.desc":"Akses berbagai model AI lewat satu API key tanpa perlu mendaftar ke setiap provider. Cukup top up saldo, buat API key, lalu mulai kirim request. Cocok untuk developer individu, tim kecil, dan side project.",
+"prod.p1.li1":"Satu API key untuk mengakses berbagai model AI","prod.p1.li2":"Top up mulai Rp50.000 via QRIS, VA, atau e-wallet","prod.p1.li3":"Routing otomatis sesuai kompleksitas setiap request","prod.p1.li4":"Buat beberapa API key sesuai kebutuhan",
+"prod.p1.mock.workspace":"Workspace Personal","prod.p1.mock.users":"1 pengguna","prod.p1.mock.routing_label":"Routing Model",
+"prod.p1.route1":"Pertanyaan singkat & cepat","prod.p1.route2":"Tugas harian, kompleksitas sedang","prod.p1.route3":"Reasoning & analisis berat",
+"prod.p2.tag":"Enterprise · Postpaid","prod.p2.h3":"Untuk Tim &amp; Perusahaan","prod.p2.desc":"Kelola pemakaian AI seluruh tim dengan skema postpaid. Penggunaan dihitung berdasarkan token dan ditagih melalui satu invoice bulanan, dengan akses dan budget yang dapat diatur untuk setiap user atau tim.",
+"prod.p2.li1":"Seluruh pemakaian tim dalam satu invoice bulanan","prod.p2.li2":"Atur role dan budget per user atau tim","prod.p2.li3":"Sesuaikan limit kredit dengan kebutuhan perusahaan","prod.p2.li4":"SLA dan dukungan teknis prioritas","prod.p2.cta":"Ajukan Enterprise",
+"prod.p2.mock.usage_label":"Pemakaian Bulan Ini","prod.p2.mock.members_label":"Anggota Tim","prod.p2.mock.members_value":"12 users","prod.p2.mock.invoice_label":"Invoice Terakhir","prod.p2.mock.invoice_value":"#INV-0842 · Lunas",
+"price.eyebrow":"Harga","price.title":"Pilih skema sesuai kebutuhan","price.desc":"Mulai dengan Personal, lalu beralih ke Enterprise saat kebutuhan tim berkembang.",
+"price.personal.value":"Top up mulai Rp50.000","price.personal.sub":"Bayar sesuai pemakaian",
+"price.personal.li1":"Akses berbagai model AI melalui satu API key","price.personal.li2":"Top up via QRIS, VA, atau e-wallet","price.personal.li3":"Routing otomatis sesuai kompleksitas tugas","price.personal.li4":"Buat beberapa API key sesuai kebutuhan","price.personal.li5":"Tanpa kontrak atau biaya langganan bulanan",
+"price.badge":"Rekomendasi","price.ent.tag":"Enterprise","price.ent.value":"Custom","price.ent.sub":"Ditagih bulanan lewat satu invoice",
+"price.ent.li1":"Semua fitur Personal untuk seluruh tim","price.ent.li2":"Satu invoice bulanan tanpa top up manual","price.ent.li3":"Atur role dan budget per user atau tim","price.ent.li4":"Limit kredit sesuai skala perusahaan","price.ent.li5":"SLA dan dukungan teknis prioritas",
+"faq.h2":"FAQ","faq.desc":"Jawaban singkat tentang model, pembayaran, routing, dan integrasi.",
+"faq.q1":"Apa itu ConextRouter?","faq.a1":"Gateway API yang menghubungkan aplikasimu ke berbagai model AI lewat satu API key.",
+"faq.q2":"Model AI apa yang tersedia?","faq.a2":"Tersedia berbagai model dari OpenAI, Google Gemini, Anthropic Claude, Alibaba Qwen, DeepSeek, dan provider lainnya. Daftar model akan terus diperbarui.",
+"faq.q3":"Bagaimana ConextRouter memilih model AI?","faq.a3":"Sistem menilai kompleksitas setiap request lalu mengarahkannya ke model yang sesuai. Tugas sederhana menggunakan model yang lebih ringan, sedangkan tugas kompleks diarahkan ke model dengan kemampuan reasoning lebih tinggi.",
+"faq.q4":"Bagaimana cara bayar?","faq.a4":"Personal dapat top up melalui QRIS, VA, atau e-wallet. Untuk Enterprise tersedia skema tagihan bulanan.",
+"faq.q5":"Apakah perlu banyak perubahan kode?","faq.a5":"ConextRouter kompatibel dengan format OpenAI dan Anthropic. Pada banyak kasus, cukup ganti base URL.",
+"final.title":"Siap mulai dengan ConextRouter?","final.desc":"Buat akun gratis. Saat kebutuhan tim berkembang, beralih ke Enterprise kapan saja.",
+"footer.tagline":"Gateway API AI dari Ralali.","footer.col1.title":"Produk","footer.col2.title":"Developer","footer.col3.title":"Perusahaan",
+"footer.status":"Status","footer.tentang":"Tentang","footer.kontak":"Kontak","footer.copyright":"© 2026 ConextRouter. Seluruh hak cipta dilindungi.","footer.powered_by":"Powered by"
+},
+en: {
+"nav.produk":"Product","nav.cara_kerja":"How It Works","nav.faq":"FAQ","nav.docs":"Docs","nav.masuk":"Log In",
+"hero.eyebrow":"Powered by","hero.title":"One API.<br>Every AI model.","hero.lead":"Top up your balance, create an API key, and start using it right away. ConextRouter automatically picks the best-fit model for every request, so you can focus on building your product.","hero.cta1":"Create Free Account","hero.cta2":"See How It Works",
+"mock.dashboard_title":"Dashboard","mock.saldo":"Active Balance","mock.token":"Tokens Used","mock.apikeys":"Active API Keys","mock.live":"Live","mock.aktif":"Active","mock.otomatis":"Automatic",
+"why.eyebrow":"Why ConextRouter","why.title":"How is it different from other AI routers?","why.desc":"Most AI routers are built for the global market. ConextRouter is built to be more practical for users in Indonesia.",
+"why.col1":"Self-Host<br>Router","why.col2":"Global Marketplace<br>Router","why.col3":"Global Enterprise<br>Router",
+"why.r1.label":"Choosing a model","why.r1.c1":"Manual, set up yourself through configuration","why.r1.c2":"Manual, you pick the model yourself","why.r1.c3":"Manual or basic automatic routing","why.r1.c4":"Automatic based on task complexity",
+"why.r2.label":"Currency & pricing","why.r2.c1":"Free, but you cover the infrastructure cost yourself","why.r2.c2":"USD + around 5% transaction fee","why.r2.c3":"USD, starting at US$49/month","why.r2.c4":"Rupiah with transparent pricing",
+"why.r3.label":"Payment method","why.r3.c1":"Credit card straight to the AI provider","why.r3.c2":"International credit card","why.r3.c3":"Credit card or company invoice","why.r3.c4":"QRIS, virtual account, or local e-wallet",
+"why.r4.label":"Setup & infrastructure","why.r4.c1":"Self-hosted, you manage your own server and database","why.r4.c2":"Managed cloud, no local data-residency option","why.r4.c3":"Managed cloud with more complex setup","why.r4.c4":"Fully managed, ready to use, backed by Alibaba Cloud",
+"why.r5.label":"AI ecosystem","why.r5.c1":"Standalone, no wider product ecosystem","why.r5.c2":"Standalone, no local ecosystem integration","why.r5.c3":"Part of a global platform, not a local ecosystem","why.r5.c4":"Connected to the Ralali Group AI ecosystem (AIRIN, ConextLab)",
+"why.note":"Based on general patterns among global AI routers/gateways as of August 2026 — platform names withheld.",
+"how.eyebrow":"How It Works","how.title":"Get started in three steps","how.desc":"No major migration needed. Just adjust your integration and keep using the code you already have.",
+"how.s1.title":"Create an account","how.s1.desc":"Sign up and verify your email.",
+"how.s2.title":"Create an API key","how.s2.desc":"Set your usage limit, then generate an API key.",
+"how.s3.title":"Start sending requests","how.s3.desc":"Swap the base URL, then reuse your existing code.",
+"dashsec.eyebrow":"Dashboard","dashsec.title":"Monitor everything from one dashboard","dashsec.desc":"See your balance, usage, and API keys in a single place.",
+"prod.eyebrow":"Product","prod.title":"One platform for every scale","prod.desc":"Pick the plan that fits your needs, from individual developers to enterprise teams.",
+"prod.p1.tag":"Personal","prod.p1.h3":"For Individual Developers","prod.p1.desc":"Access a wide range of AI models through a single API key, with no need to sign up with every provider separately. Just top up your balance, create an API key, and start sending requests. Great for individual developers, small teams, and side projects.",
+"prod.p1.li1":"One API key to access many AI models","prod.p1.li2":"Top up from Rp50,000 via QRIS, virtual account, or e-wallet","prod.p1.li3":"Automatic routing based on each request's complexity","prod.p1.li4":"Create as many API keys as you need",
+"prod.p1.mock.workspace":"Personal Workspace","prod.p1.mock.users":"1 user","prod.p1.mock.routing_label":"Model Routing",
+"prod.p1.route1":"Quick, short questions","prod.p1.route2":"Everyday tasks, medium complexity","prod.p1.route3":"Heavy reasoning & analysis",
+"prod.p2.tag":"Enterprise · Postpaid","prod.p2.h3":"For Teams &amp; Companies","prod.p2.desc":"Manage your whole team's AI usage with a postpaid plan. Usage is calculated by token and billed through a single monthly invoice, with configurable access and budget per user or team.",
+"prod.p2.li1":"All of your team's usage in one monthly invoice","prod.p2.li2":"Set roles and budgets per user or team","prod.p2.li3":"Adjust credit limits to fit your company's needs","prod.p2.li4":"Priority SLA and technical support","prod.p2.cta":"Talk to Enterprise Sales",
+"prod.p2.mock.usage_label":"Usage This Month","prod.p2.mock.members_label":"Team Members","prod.p2.mock.members_value":"12 users","prod.p2.mock.invoice_label":"Last Invoice","prod.p2.mock.invoice_value":"#INV-0842 · Paid",
+"price.eyebrow":"Pricing","price.title":"Pick the plan that fits","price.desc":"Start with Personal, then move to Enterprise as your team's needs grow.",
+"price.personal.value":"Top up from Rp50,000","price.personal.sub":"Pay as you go",
+"price.personal.li1":"Access many AI models through a single API key","price.personal.li2":"Top up via QRIS, virtual account, or e-wallet","price.personal.li3":"Automatic routing based on task complexity","price.personal.li4":"Create as many API keys as you need","price.personal.li5":"No contract or monthly subscription fee",
+"price.badge":"Recommended","price.ent.tag":"Enterprise","price.ent.value":"Custom","price.ent.sub":"Billed monthly through a single invoice",
+"price.ent.li1":"Everything in Personal, for your whole team","price.ent.li2":"One monthly invoice, no manual top ups","price.ent.li3":"Set roles and budgets per user or team","price.ent.li4":"Credit limits that scale with your company","price.ent.li5":"Priority SLA and technical support",
+"faq.h2":"FAQ","faq.desc":"Quick answers about models, payments, routing, and integration.",
+"faq.q1":"What is ConextRouter?","faq.a1":"An API gateway that connects your app to a wide range of AI models through a single API key.",
+"faq.q2":"Which AI models are available?","faq.a2":"Models from OpenAI, Google Gemini, Anthropic Claude, Alibaba Qwen, DeepSeek, and other providers are available. The model list keeps growing.",
+"faq.q3":"How does ConextRouter choose a model?","faq.a3":"The system evaluates the complexity of each request and routes it to a matching model. Simple tasks use a lighter model, while complex tasks are routed to a model with stronger reasoning capability.",
+"faq.q4":"How do I pay?","faq.a4":"Personal accounts can top up via QRIS, virtual account, or e-wallet. A monthly billing plan is available for Enterprise.",
+"faq.q5":"Do I need to change a lot of code?","faq.a5":"ConextRouter is compatible with the OpenAI and Anthropic formats. In most cases, just swap the base URL.",
+"final.title":"Ready to get started with ConextRouter?","final.desc":"Create a free account. Move to Enterprise anytime your team's needs grow.",
+"footer.tagline":"An AI API gateway from Ralali.","footer.col1.title":"Product","footer.col2.title":"Developer","footer.col3.title":"Company",
+"footer.status":"Status","footer.tentang":"About","footer.kontak":"Contact","footer.copyright":"© 2026 ConextRouter. All rights reserved.","footer.powered_by":"Powered by"
+},
+zh: {
+"nav.produk":"产品","nav.cara_kerja":"工作原理","nav.faq":"常见问题","nav.docs":"文档","nav.masuk":"登录",
+"hero.eyebrow":"技术支持","hero.title":"一个 API。<br>接入所有 AI 模型。","hero.lead":"充值余额，创建 API 密钥，即刻开始使用。ConextRouter 会为每个请求自动选择最合适的模型，让你专注于产品开发。","hero.cta1":"免费注册","hero.cta2":"查看工作原理",
+"mock.dashboard_title":"仪表盘","mock.saldo":"可用余额","mock.token":"已用 Token","mock.apikeys":"活跃 API 密钥","mock.live":"实时","mock.aktif":"启用中","mock.otomatis":"自动",
+"why.eyebrow":"为什么选择 ConextRouter","why.title":"和其他 AI 路由平台有什么不同？","why.desc":"许多 AI 路由平台是为全球市场设计的，而 ConextRouter 专为印尼用户的实际需求打造。",
+"why.col1":"自建<br>路由平台","why.col2":"全球市场化<br>路由平台","why.col3":"全球企业级<br>路由平台",
+"why.r1.label":"模型选择方式","why.r1.c1":"手动，需自行配置","why.r1.c2":"手动，自行选择模型","why.r1.c3":"手动或基础自动路由","why.r1.c4":"根据任务复杂度自动路由",
+"why.r2.label":"货币与价格","why.r2.c1":"免费，但基础设施成本需自行承担","why.r2.c2":"美元计价，另收约 5% 交易手续费","why.r2.c3":"美元计价，起价每月 49 美元","why.r2.c4":"印尼盾计价，价格透明",
+"why.r3.label":"支付方式","why.r3.c1":"信用卡直接支付给 AI 服务商","why.r3.c2":"国际信用卡","why.r3.c3":"信用卡或企业发票","why.r3.c4":"QRIS、虚拟账户或本地电子钱包",
+"why.r4.label":"部署与基础设施","why.r4.c1":"自建部署，自行管理服务器与数据库","why.r4.c2":"托管云服务，无本地数据存储选项","why.r4.c3":"托管云服务，部署较复杂","why.r4.c4":"全托管、开箱即用，由阿里云提供支持",
+"why.r5.label":"AI 生态","why.r5.c1":"独立运作，无更广泛的产品生态","why.r5.c2":"独立运作，未与本地生态整合","why.r5.c3":"属于全球平台的一部分，非本地生态","why.r5.c4":"接入 Ralali 集团 AI 生态（AIRIN、ConextLab）",
+"why.note":"基于截至 2026 年 8 月全球 AI 路由/网关平台的一般模式整理，平台名称已隐去。",
+"how.eyebrow":"工作原理","how.title":"三步即可开始","how.desc":"无需大规模迁移，只需调整对接方式，即可继续使用现有代码。",
+"how.s1.title":"创建账户","how.s1.desc":"注册并验证邮箱。",
+"how.s2.title":"创建 API 密钥","how.s2.desc":"设置用量限额，然后创建 API 密钥。",
+"how.s3.title":"开始发送请求","how.s3.desc":"替换 base URL，即可复用现有代码。",
+"dashsec.eyebrow":"仪表盘","dashsec.title":"在一个仪表盘中掌握全部信息","dashsec.desc":"在同一界面查看余额、用量与 API 密钥。",
+"prod.eyebrow":"产品","prod.title":"一个平台，适配各种规模","prod.desc":"根据需求选择合适的方案，从个人开发者到企业团队皆可适用。",
+"prod.p1.tag":"个人版","prod.p1.h3":"面向个人开发者","prod.p1.desc":"通过一个 API 密钥即可访问多种 AI 模型，无需分别向每个服务商注册。只需充值余额、创建 API 密钥，即可开始发送请求，适合个人开发者、小型团队与副业项目。",
+"prod.p1.li1":"一个 API 密钥即可访问多种 AI 模型","prod.p1.li2":"最低 5 万印尼盾起充，支持 QRIS、虚拟账户或电子钱包","prod.p1.li3":"根据每个请求的复杂度自动路由","prod.p1.li4":"可按需创建多个 API 密钥",
+"prod.p1.mock.workspace":"个人工作区","prod.p1.mock.users":"1 位用户","prod.p1.mock.routing_label":"模型路由",
+"prod.p1.route1":"简短快速的提问","prod.p1.route2":"日常任务，中等复杂度","prod.p1.route3":"高强度推理与分析",
+"prod.p2.tag":"企业版 · 后付费","prod.p2.h3":"面向团队与企业","prod.p2.desc":"以后付费方式管理整个团队的 AI 用量。用量按 Token 计算，通过每月一张账单结算，并可为每位用户或团队设置访问权限与预算。",
+"prod.p2.li1":"团队全部用量汇总为一张月度账单","prod.p2.li2":"按用户或团队设置角色与预算","prod.p2.li3":"根据企业需求调整信用额度","prod.p2.li4":"优先 SLA 与技术支持","prod.p2.cta":"咨询企业版",
+"prod.p2.mock.usage_label":"本月用量","prod.p2.mock.members_label":"团队成员","prod.p2.mock.members_value":"12 位用户","prod.p2.mock.invoice_label":"最近账单","prod.p2.mock.invoice_value":"#INV-0842 · 已付款",
+"price.eyebrow":"价格","price.title":"选择适合的方案","price.desc":"从个人版开始，随着团队需求增长再升级到企业版。",
+"price.personal.value":"最低 5 万印尼盾起充","price.personal.sub":"按实际用量付费",
+"price.personal.li1":"通过一个 API 密钥访问多种 AI 模型","price.personal.li2":"支持 QRIS、虚拟账户或电子钱包充值","price.personal.li3":"根据任务复杂度自动路由","price.personal.li4":"可按需创建多个 API 密钥","price.personal.li5":"无合约、无月度订阅费用",
+"price.badge":"推荐","price.ent.tag":"企业版","price.ent.value":"定制报价","price.ent.sub":"按月通过一张账单结算",
+"price.ent.li1":"包含个人版全部功能，适用于整个团队","price.ent.li2":"每月一张账单，无需手动充值","price.ent.li3":"按用户或团队设置角色与预算","price.ent.li4":"信用额度可随企业规模调整","price.ent.li5":"优先 SLA 与技术支持",
+"faq.h2":"常见问题","faq.desc":"关于模型、支付、路由与对接方式的简要解答。",
+"faq.q1":"什么是 ConextRouter？","faq.a1":"一个 API 网关，通过一个 API 密钥将你的应用连接到多种 AI 模型。",
+"faq.q2":"支持哪些 AI 模型？","faq.a2":"支持来自 OpenAI、Google Gemini、Anthropic Claude、阿里云通义千问、DeepSeek 等服务商的多种模型，模型列表持续更新。",
+"faq.q3":"ConextRouter 如何选择模型？","faq.a3":"系统会评估每个请求的复杂度，并将其路由到合适的模型：简单任务使用更轻量的模型，复杂任务则路由到推理能力更强的模型。",
+"faq.q4":"如何付款？","faq.a4":"个人版可通过 QRIS、虚拟账户或电子钱包充值；企业版提供按月账单结算方案。",
+"faq.q5":"是否需要大量修改代码？","faq.a5":"ConextRouter 兼容 OpenAI 与 Anthropic 的接口格式，多数情况下只需替换 base URL 即可。",
+"final.title":"准备好开始使用 ConextRouter 了吗？","final.desc":"免费注册账户，待团队需求增长后随时升级到企业版。",
+"footer.tagline":"来自 Ralali 的 AI API 网关。","footer.col1.title":"产品","footer.col2.title":"开发者","footer.col3.title":"公司",
+"footer.status":"服务状态","footer.tentang":"关于我们","footer.kontak":"联系我们","footer.copyright":"© 2026 ConextRouter。保留所有权利。","footer.powered_by":"技术支持"
+}
+};
+
+
 (function(){
-  var el = document.getElementById('heroTitle');
-  if(!el) return;
-  el.innerHTML = 'Satu API.<br>Semua model AI.';
+  var LANG_NAMES = { id: 'ID', en: 'EN', zh: '中文' };
+  var STORAGE_KEY = 'cr_lang';
+
+  function getLang(){
+    try{
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if(saved && CR_I18N[saved]) return saved;
+    }catch(e){}
+    return 'id';
+  }
+
+  function applyLang(lang){
+    if(!CR_I18N[lang]) lang = 'id';
+    var dict = CR_I18N[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var key = el.getAttribute('data-i18n');
+      if(dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(function(el){
+      var key = el.getAttribute('data-i18n-html');
+      if(dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    document.documentElement.setAttribute('lang', lang);
+    var btnLabel = document.getElementById('langBtnLabel');
+    if(btnLabel) btnLabel.textContent = LANG_NAMES[lang] || lang.toUpperCase();
+    document.querySelectorAll('.lang-menu button').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+    try{ localStorage.setItem(STORAGE_KEY, lang); }catch(e){}
+  }
+
+  function initSwitcher(){
+    var btn = document.getElementById('langBtn');
+    var menu = document.getElementById('langMenu');
+    if(!btn || !menu) return;
+    function closeMenu(){
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+    function toggleMenu(){
+      var open = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      toggleMenu();
+    });
+    menu.querySelectorAll('button[data-lang]').forEach(function(b){
+      b.addEventListener('click', function(){
+        applyLang(b.getAttribute('data-lang'));
+        closeMenu();
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!menu.contains(e.target) && e.target !== btn) closeMenu();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') closeMenu();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    initSwitcher();
+    applyLang(getLang());
+  });
 })();
+
 </script>
 </body>
 </html>

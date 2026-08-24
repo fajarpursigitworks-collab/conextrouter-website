@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dokumentasi — ConextRouter</title>
+<meta name="description" content="Dokumentasi ConextRouter: autentikasi, base URL, model & routing otomatis, contoh kode, error handling, rate limit, dan harga.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1A1615;
+    --ink-soft:#453F3D;
+    --muted:#757170;
+    --line:#E3E1E1;
+    --surface:#F9F8F8;
+    --surface-alt:#F4F1EE;
+    --card:#FFFFFF;
+    --accent:#5B5FEA;
+    --accent-soft:#5B5FEA14;
+    --alibaba:#FF6A2B;
+    --font: 'Plus Jakarta Sans', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  @media (prefers-reduced-motion: reduce){
+    *,*::before,*::after{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+  body{ margin:0; font-family:var(--font); color:var(--ink); background:var(--card); line-height:1.5; -webkit-font-smoothing:antialiased; }
+  h1,h2,h3,h4{ font-family:var(--font); font-weight:700; margin:0; letter-spacing:-0.01em; }
+  p{ margin:0; }
+  a{ text-decoration:none; color:inherit; }
+  img{ display:block; max-width:100%; }
+  button{ font-family:inherit; cursor:pointer; }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:4px; }
+  .wrap{ max-width:1160px; margin:0 auto; padding:0 24px; }
+
+  .btn{ display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:999px; font-weight:600; font-size:14.5px; border:1px solid transparent; transition:transform .15s ease, background .2s ease; white-space:nowrap; }
+  .btn:active{ transform:scale(0.97); }
+  .btn-dark{ background:var(--ink); color:#fff; }
+  .btn-dark:hover{ background:var(--ink-soft); transform:translateY(-2px); }
+  .btn-light{ background:#fff; color:var(--ink); border-color:var(--line); }
+  .btn-light:hover{ background:var(--surface-alt); transform:translateY(-2px); }
+  .btn-ghost{ background:transparent; color:var(--ink); }
+  .btn-ghost:hover{ background:rgba(0,0,0,0.05); }
+
+  /* ---------- NAV (shared with homepage) ---------- */
+  .nav-float{ position:fixed; top:16px; left:16px; right:16px; z-index:50; display:flex; justify-content:center; }
+  .nav-inner{ width:100%; max-width:1160px; height:64px; border-radius:999px; background:rgba(255,255,255,0.65); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border:1px solid rgba(255,255,255,0.8); box-shadow:0 4px 24px -4px rgba(26,22,21,0.1); display:flex; align-items:center; justify-content:space-between; padding:0 10px 0 16px; }
+  .brand{ display:flex; align-items:center; gap:9px; font-weight:700; font-size:16.5px; }
+  .nav-links{ display:flex; gap:6px; }
+  .nav-links a{ position:relative; font-weight:500; font-size:14px; color:var(--ink); padding:9px 16px; border-radius:999px; transition:background .15s ease; }
+  .nav-links a:hover{ background:rgba(0,0,0,0.05); }
+  .nav-links a.active{ background:var(--accent-soft); color:var(--accent); }
+  .nav-links a::after{ content:""; position:absolute; left:16px; right:16px; bottom:5px; height:1.5px; background:var(--accent); transform:scaleX(0); transform-origin:left; transition:transform .25s ease; }
+  .nav-links a:hover::after{ transform:scaleX(1); }
+  .nav-cta{ display:flex; align-items:center; gap:6px; }
+  .nav-toggle{ display:none; background:none; border:none; width:38px; height:38px; align-items:center; justify-content:center; border-radius:999px; }
+
+  /* ---------- LANGUAGE SWITCHER (shared) ---------- */
+  .lang-switch{ position:relative; }
+  .lang-btn{ display:flex; align-items:center; gap:6px; padding:9px 13px; border-radius:999px; border:1px solid var(--line); background:#fff; color:var(--ink-soft); font-size:13px; font-weight:600; transition:border-color .15s ease, color .15s ease, background .15s ease; }
+  .lang-btn:hover{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+  .lang-btn .lang-chev{ transition:transform .18s ease; }
+  .lang-btn[aria-expanded="true"] .lang-chev{ transform:rotate(180deg); }
+  .lang-menu{ position:absolute; top:calc(100% + 8px); left:0; min-width:190px; background:#fff; border:1px solid var(--line); border-radius:14px; box-shadow:0 20px 44px -16px rgba(26,22,21,0.28); padding:6px; opacity:0; visibility:hidden; transform:translateY(-6px); transition:opacity .16s ease, transform .16s ease, visibility .16s; z-index:60; }
+  .lang-menu.open{ opacity:1; visibility:visible; transform:translateY(0); }
+  .lang-menu button{ display:flex; align-items:center; gap:9px; width:100%; text-align:left; padding:9px 11px; border-radius:9px; background:none; border:none; font-size:13.5px; font-weight:500; color:var(--ink-soft); }
+  .lang-menu button:hover{ background:var(--surface-alt); color:var(--ink); }
+  .lang-menu button.active{ background:var(--accent-soft); color:var(--accent); font-weight:700; }
+  .lang-flag{ font-size:15px; line-height:1; }
+
+  /* ---------- DOCS HERO ---------- */
+  .docs-hero{ padding:150px 0 56px; background:linear-gradient(180deg,var(--surface) 0%,var(--card) 100%); border-bottom:1px solid var(--line); }
+  .docs-badge{ display:inline-flex; align-items:center; gap:7px; padding:6px 14px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:12.5px; font-weight:700; margin-bottom:18px; }
+  .docs-hero h1{ font-size:clamp(30px,4.6vw,46px); max-width:640px; margin-bottom:14px; }
+  .docs-hero p.lead{ font-size:16.5px; color:var(--muted); max-width:560px; margin-bottom:26px; }
+  .docs-hero-ctas{ display:flex; gap:10px; flex-wrap:wrap; }
+
+  /* ---------- DOCS SHELL (sidebar + content) ---------- */
+  .docs-shell{ display:flex; align-items:flex-start; gap:48px; padding:56px 0 100px; }
+  .docs-side{ width:230px; flex:none; position:sticky; top:96px; }
+  .docs-side-title{ font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:12px; padding-left:12px; }
+  .docs-toc{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
+  .docs-toc a{ display:block; padding:8px 12px; border-radius:9px; font-size:13.5px; color:var(--ink-soft); font-weight:500; border-left:2px solid transparent; transition:background .15s ease, color .15s ease, border-color .15s ease; }
+  .docs-toc a:hover{ background:var(--surface); color:var(--ink); }
+  .docs-toc a.active{ background:var(--accent-soft); color:var(--accent); border-left-color:var(--accent); font-weight:700; }
+
+  .docs-content{ flex:1; min-width:0; max-width:760px; }
+  .doc-section{ padding-top:8px; margin-bottom:56px; scroll-margin-top:96px; }
+  .doc-section h2{ font-size:24px; margin-bottom:10px; display:flex; align-items:center; gap:10px; }
+  .doc-section .doc-num{ display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:9px; background:var(--ink); color:#fff; font-size:12.5px; font-weight:800; flex:none; }
+  .doc-section > p.doc-desc{ color:var(--muted); font-size:15px; margin:10px 0 18px; line-height:1.65; }
+  .doc-section h3{ font-size:16.5px; margin:26px 0 10px; }
+  .doc-body p{ color:var(--ink-soft); font-size:14.5px; line-height:1.7; margin-bottom:10px; }
+  .doc-body ul, .doc-body ol{ margin:0 0 14px; padding-left:20px; color:var(--ink-soft); font-size:14.5px; line-height:1.75; }
+  .doc-body li{ margin-bottom:6px; }
+  .doc-body code.inline{ font-family:var(--mono); font-size:12.5px; background:var(--surface-alt); border:1px solid var(--line); border-radius:5px; padding:2px 6px; color:var(--ink); }
+
+  .doc-card{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px 22px; margin:16px 0; }
+  .doc-callout{ display:flex; gap:12px; background:var(--accent-soft); border:1px solid #5B5FEA33; border-radius:14px; padding:16px 18px; margin:18px 0; }
+  .doc-callout svg{ flex:none; color:var(--accent); margin-top:1px; }
+  .doc-callout p{ margin:0; color:var(--ink-soft); font-size:13.5px; line-height:1.6; }
+  .doc-callout strong{ color:var(--ink); }
+
+  .code-tabs{ display:flex; gap:4px; background:var(--surface-alt); border-radius:12px 12px 0 0; padding:6px; border:1px solid var(--line); border-bottom:none; }
+  .code-tab-btn{ padding:7px 14px; border-radius:8px; font-size:12.5px; font-weight:600; color:var(--muted); background:none; border:none; font-family:var(--mono); }
+  .code-tab-btn.active{ background:#fff; color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  .code-block-wrap{ position:relative; margin:0 0 18px; }
+  pre.code-block{ margin:0; background:#171412; color:#F1EDE9; border-radius:0 0 14px 14px; border:1px solid #171412; padding:18px 20px; overflow-x:auto; font-family:var(--mono); font-size:12.8px; line-height:1.7; }
+  .code-tabs + pre.code-block{ border-radius:0 0 14px 14px; }
+  pre.code-block:first-child, .code-block-wrap > pre.code-block:only-child{ border-radius:14px; }
+  pre.code-block .c-key{ color:#8B93FF; }
+  pre.code-block .c-str{ color:#8FD19E; }
+  pre.code-block .c-com{ color:#847E79; }
+  pre.code-block .c-num{ color:#FFB870; }
+  .code-panel{ display:none; }
+  .code-panel.active{ display:block; }
+
+  .doc-table-wrap{ overflow-x:auto; margin:16px 0; border:1px solid var(--line); border-radius:14px; }
+  table.doc-table{ width:100%; border-collapse:collapse; font-size:13.5px; min-width:520px; }
+  table.doc-table th{ text-align:left; background:var(--surface); color:var(--muted); font-size:11.5px; text-transform:uppercase; letter-spacing:.04em; font-weight:700; padding:11px 16px; border-bottom:1px solid var(--line); }
+  table.doc-table td{ padding:12px 16px; border-bottom:1px solid var(--surface-alt); color:var(--ink-soft); vertical-align:top; }
+  table.doc-table tr:last-child td{ border-bottom:none; }
+  table.doc-table code.inline{ font-family:var(--mono); font-size:12px; background:var(--surface-alt); border:1px solid var(--line); border-radius:5px; padding:2px 6px; color:var(--ink); }
+  .status-dot{ display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:6px; }
+  .status-dot.err{ background:#E4453A; }
+  .status-dot.warn{ background:#E8A33D; }
+
+  .doc-model-badge{ display:inline-flex; align-items:center; font-family:var(--mono); font-weight:700; font-size:11.5px; color:var(--accent); background:var(--accent-soft); padding:3px 9px; border-radius:999px; }
+
+  .doc-support-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:16px; }
+  .doc-support-card{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:20px; transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+  .doc-support-card:hover{ transform:translateY(-4px); border-color:var(--accent); box-shadow:0 16px 32px -18px rgba(26,22,21,.25); }
+  .doc-support-card h4{ font-size:14.5px; margin-bottom:6px; }
+  .doc-support-card p{ font-size:13px; color:var(--muted); margin-bottom:12px; }
+
+  @media (max-width:900px){
+    .docs-shell{ flex-direction:column; gap:28px; }
+    .docs-side{ position:static; width:100%; }
+    .docs-toc{ flex-direction:row; flex-wrap:wrap; }
+    .docs-toc a{ border-left:none; border-bottom:2px solid transparent; }
+    .docs-toc a.active{ border-bottom-color:var(--accent); }
+    .doc-support-grid{ grid-template-columns:1fr; }
+  }
+  @media (max-width:640px){
+    .wrap{ padding:0 18px; }
+    .nav-links{ display:none; }
+    .nav-toggle{ display:flex; }
+    .nav-cta .btn-ghost{ display:none; }
+    .lang-btn span:not(.lang-flag){ display:none; }
+    .lang-btn #langBtnLabel{ display:inline; }
+    .lang-btn{ padding:9px; }
+    .docs-hero{ padding:130px 0 40px; }
+  }
+
+  /* ---------- FOOTER (shared) ---------- */
+  footer{ background:var(--ink); color:#fff; padding:56px 0 28px; }
+  footer .brand img{ filter:brightness(0) invert(1); }
+  .foot-grid{ display:grid; grid-template-columns:1.3fr repeat(3,1fr); gap:32px; margin-bottom:40px; }
+  .foot-brand p{ color:#9C9591; font-size:13.5px; margin-top:12px; max-width:240px; }
+  .foot-col h5{ font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:#9C9591; margin-bottom:14px; }
+  .foot-col ul{ list-style:none; margin:0; padding:0; }
+  .foot-col ul li{ margin-bottom:10px; }
+  .foot-col ul li a{ font-size:14px; color:#C9C4C1; transition:color .15s ease, padding-left .15s ease; }
+  .foot-col ul li a:hover{ color:#fff; padding-left:3px; }
+  .foot-bottom{ display:flex; justify-content:space-between; align-items:center; padding-top:24px; border-top:1px solid #2A2624; flex-wrap:wrap; gap:10px; }
+  .foot-bottom p{ font-size:12.5px; color:#9C9591; }
+  .powered-badge{ display:inline-flex; align-items:center; gap:14px; }
+  .powered-badge span{ font-size:12.5px; color:#8B8581; }
+  .powered-logo{ display:block; width:auto; }
+  .powered-logo.ralali{ height:28px; }
+  .powered-logo.alibaba{ height:17px; }
+  .powered-divider{ width:1px; height:22px; background:#3A3532; }
+  @media (max-width:640px){
+    .foot-grid{ grid-template-columns:1fr; gap:28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-float">
+  <div class="nav-inner wrap" style="padding-left:16px;padding-right:10px;">
+    <a href="index.html#top" class="brand">
+      <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNDY3IDE2OS4yMSI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjYuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS40IEJ1aWxkIDEwOSkgIC0tPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuc3QwIHsKICAgICAgICBmaWxsOiAjMTc1MmVkOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04ODkuNTksMTY0Ljk4bC0zNC43OS0uMjUtMjguMTMtNTYuNzVoLTIzLjQ4bC4wNSw1My40MmMwLDEuMTctMi4zMiwzLjUtMy41NCwzLjVsLTMzLjY2LS4wMy0xLjI1LTEwLjc5LjA1LTE0OS44NSw3Ni40NC4yMmM5LjU1LjAzLDE4LjU3LDMuNDMsMjYuODgsNi45OSw5LjM5LDUuMDcsMTYuMjQsMTEuOTksMjAuNjksMjEuNzEsMTAuMywyNi4xMSwzLjE4LDU3LjI5LTIzLjM2LDY5LjA5bDMyLjA0LDYxLjZjLTEuOTEuNDktNS4zOCwxLjE2LTcuOTUsMS4xNGgwWk04NTMuOTcsNTYuODVjLjU3LTE0LjI1LTEwLjMzLTIzLjIzLTIzLjQxLTIzLjE4bC0yNy4zNS4xdjQ3LjEzbDMwLjkyLS4yOGMxMi40NS0uMTEsMjAuNzctMTEuMzYsMTkuODMtMjMuNzZoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIwLjk5LDEzMC41M2MtMTEuMTksMzMuNDQtNDcuOTIsNDMuMDUtNzkuNzIsMzQuMTEtMzYuOTgtMTAuMzktNDYuOTMtNTIuOTctMzYuMjgtODYuNzUsMTEuMzYtMzYuMDYsNTIuNDUtNDYuNDUsODQuODEtMzQuMTIsMzMuOSwxMi45Miw0MS45OCw1NC41LDMxLjE4LDg2Ljc1aC4wMVpNOTg0LjAxLDgyLjk1Yy0zLjQ4LTEwLjAyLTExLjI5LTE1LjU0LTIwLjk3LTE1LjQ4cy0xNi45Niw1LjQtMjAuNDcsMTVjLTguMTQsMjIuMjUtMy4zMSw1NywyMC40OCw1Ni44NiwyNC40Ni0uMTQsMjguNy0zNC4xMiwyMC45Ni01Ni4zOGgwWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTMuODgsNDEuNjNsLS4wNCwxMjIuODMtMzcuMDEuNDktMS4wNS0xOS44OWMtOC4xMiwxNi41NC0yMS41OCwyMi45My0zOC4yOSwyMi42NS0yNi44Ni0uNDQtMzkuMTctMTguMzUtNDAuMDMtNDQuNTlsLS4wNS04MS4zMywzNy4xMy0uMTIuMTMsNzMuNTdjMCwzLjgyLDEuMDEsOC4zOCwyLjI0LDExLjQ0LDMuMTQsNy44LDkuOTIsMTAuNjgsMTcuNjIsMTAuNzEsMTEuODUuMDQsMjAuMDktNy40MiwyMS45NS0xOS41MmwuMDktNzUuOTksMzcuMzItLjIzdi0uMDJaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI5OS4xNCwxMzYuNjZjOS40NCw3LjM0LDI5Ljk1LDUuNjIsMzguNDEtNy41NWwzMy4yNy4wNGMtOC4wMywzMy44OC00NC43OSw0My43My03Ni4xNCwzNi4yNy0xOC44OS00LjUtMzMuMjEtMTguMDUtMzguOTgtMzYuNTMtOS43Ny0zMS4yNy0xLjcxLTcxLjQxLDI5Ljg5LTg0LjY3LDE2LjcxLTcuMDEsMzYuMjEtNy4wNiw1Mi44Ny0uMTQsMjcuMywxMS4zNCwzNS40NCwzOS40MiwzMy4xNyw2OC4xbC04Mi45NC4xMWMtLjMyLDkuNDcsMi45NywxOC41NSwxMC40NSwyNC4zN2gwWk0xMzM3LjA2LDg5LjcxYy0xLjc0LTcuODMtNC4wNi0xNC45OC0xMC41MS0xOS42My04LjMzLTYuMDEtMjEuMDYtNS42OS0yOC45NSwxLjE3LTUuNDUsNC43NC03LjgzLDExLjY0LTguNzgsMTguNDhsNDguMjMtLjAyaC4wMVoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjQ0LjA1LDEzNy4wN2wtLjA1LDI3LjI1Yy0xMy4wNSwxLjItMjQuNTMsMS41MS0zNi41Ni0uNDctMTUuMzgtMi41My0yNS4xLTE0LjExLTI1LjE2LTI5LjhsLS4yNi02NC41Ny0xOC40Ny0uMjQtLjA4LTI3LjUyLDE4LjYtLjEyLS4wMi0yOC4zNCwzNy41LS4wNy0uMTYsMjguMjcsMjAuMjIuMjZjLjg1LDAsMi42My4yNywzLjIzLjYyLjc5LjQ1LDEuMjgsMi43LDEuMjcsMy43NWwtLjExLDIzLjE3LTI0LjQ0LjE4LjAyLDU1LjgyYzAsNC41LDIuNTcsOC40LDUuODYsMTAuOTYsNi4xMywxLjg1LDEwLjM1LDIsMTguNi44NGguMDFaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQxOC4yNCwxNjQuOTdsLTMzLjIxLS4zNC4wNy0xMjMuMDMsMzYuNjUuMTksMS4wNSwyMC4zOGM0LjgzLTkuMDYsNy44MS0xNS45NiwxNi40Mi0xOS4zOCw4LjgtMy40OSwxOC43Ny00LjAyLDI3Ljc4LTEuMTVsLS4wOCwzMWMtOS43OC0uODMtMTguMjQtMi41NS0yNy4wNS4xMS05Ljc3LDIuOTUtMTcuMzksMTEuNjYtMTcuNDIsMjIuMTlsLS4xNyw2Ni40MWMwLDEuMzctMi4zMiwzLjY0LTQuMDQsMy42MloiLz4KICA8L2c+CiAgPGc+CiAgICA8cGF0aCBkPSJNMTExLjM1LDEwNy45M2wzNy4zNi0uMThjLTEuMDIsMjYuNC0xNy42LDQ3LjM2LTQxLjQ2LDU2LjMyLTI5LjM0LDEwLjI3LTY2LjQ1LDUuNjUtODcuMjMtMTguMjctOC4zOC05LjY1LTEzLjk1LTIwLjc0LTE2Ljc4LTMzLjI2Qy00LjI4LDc5LjI2LjMsMzguOCwyNy40NCwxNi4yLDUwLjY2LTMuMTIsODkuNzgtNC45OCwxMTYuMDksOS42N2MxOS4zMSwxMC45MSwzMS44MywzMC4wNSwzMi41MSw1Mi43OGgtMzcuMjFjLTIuMDMtMTQuNzktMTEuNjQtMjYuMDctMjUuODctMjkuMjYtMTcuMS0zLjk1LTMzLjU0LDQuMjQtNDAuNDMsMjAuOTQtNy45LDE5LjE1LTcuOTYsNDIuMDUuMDgsNjEuMTcsNi41OSwxNS42OCwyMS41NiwyMy43NywzNy44LDIxLjQ3LDE0LjU3LTIuNTEsMjYuMTMtMTIuNTksMjguMzktMjguODNoMFoiLz4KICAgIDxwYXRoIGQ9Ik0yNzguMTgsMTI3LjgxYy05Ljg0LDM0Ljk5LTQ2LjcxLDQ2LTc5LjU3LDM3LjM0LTE3LjgzLTQuNy0zMS40Mi0xNy4xOS0zNy4yMS0zNC44LTUuMy0xNi4xMy01LjU5LTMzLjkxLTEuMDgtNTAuMzUsNS4zOS0xOS42NiwyMC40Ny0zNC4xNCw0MC4xLTM4LjgzLDMxLjM0LTcuNDgsNjUuNDgsMi43Myw3Ni42LDM0LjU4LDUuODUsMTYuNzYsNS45NywzNC45NSwxLjE2LDUyLjA1aDBaTTI0MC4wNCw4Mi45NWMtMy4zNi05LjQ4LTEwLjc4LTE1LjEyLTIwLjE3LTE1LjI5LTkuMTUtLjE3LTE3LjA4LDQuOTMtMjAuNzgsMTQuNDItNS4yOCwxMy41My01LjM0LDI5LjcuMTcsNDMuMjMsMy43Miw5LjEzLDExLjg1LDE0LjA5LDIwLjc0LDEzLjg5LDIzLjE2LS41MywyNy45OS0zMy44MywyMC4wNS01Ni4yNWgtLjAxWiIvPgogICAgPHBhdGggZD0iTTM2NC4xMyw3Mi4wMmMtNi4zLTMuNDgtMTQuODQtMy4zMy0yMC44NC0uMDctNy43NCw0LjE5LTEwLjc3LDEyLjI4LTExLjM5LDIwLjc0bC0uMDQsNzIuMjhoLTM3LjM0VjQxLjY2bDM3LjA1LS4wNy43OSwyMC4yOGM3LjkzLTE2LjA3LDIwLjY2LTIzLjI5LDM3LjI1LTIyLjg5LDEwLjk2LjI3LDIxLjczLDIuNDcsMjkuNTMsMTAuNyw4LjU4LDkuMDQsMTEsMjAuNzUsMTIuMDMsMzMuMjZsLjEsODIuMDRoLTM3LjY2bC0uMDUtNzYuNjhjLTEuMDQtNi40NS0zLjE0LTEyLjgxLTkuNDItMTYuMjloMFoiLz4KICAgIDxwYXRoIGQ9Ik00ODUuMDQsMTQwLjY3YzkuNi4yMywxOC4wMi0zLjQ2LDIyLjk0LTExLjUybDM0LjIzLS4wNmMtOC4yOSwzNC41Ni00NS45NSw0NC4yNS03Ny43MiwzNi4xNy0zNi44Ni05LjM4LTQ3LjgtNTAuMzctMzguMzktODUuMjIsNy4yNS0yNi44NiwzMC41Mi00MS4yOCw1Ny40NS00MS4yOSwyOC43Ni0uMDIsNTMuMjksMTcuMjIsNTguMTIsNDYuNzUsMS4zNyw4LjM5LDEuNTksMTcuMzMsMS42LDI2LjY5bC04My4yNS4wOWMtLjcxLDE1LjE0LDguNDMsMjguNywyNS4wMiwyOC40aDBaTTUwNy44MSw4OS42NmMtMS4xMS02LjMxLTIuNzQtMTEuNzItNi42LTE2LjE5LTYuNi03LjY1LTE3LjQ1LTkuNTItMjcuMDUtNS40LTcuNjQsMy4yNy0xMy44MiwxMi40NS0xMy41LDIxLjU4aDQ3LjE1WiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI2NjUuODUgMTY0LjkxIDYyNS4wMyAxNjUuMDMgNjAzLjMzIDEyNS4wOSA1ODEuNjMgMTY0Ljk4IDU0Mi42NiAxNjQuODEgNTgwLjAxIDEwNC4yIDU0Mi4yNSA0MS42MyA1ODQuNzUgNDEuNTcgNjA0Ljk5IDgyLjAzIDYyNS4zNyA0MS41NiA2NjUuOTkgNDEuNjIgNjI4LjA5IDEwMi42NyA2NjUuODUgMTY0LjkxIi8+CiAgICA8cGF0aCBkPSJNNzQ3LjMzLDEzNy4xN3YyNy4xYy0xMy40MywxLjc0LTI2LjYxLDEuOTYtMzkuNzgtMS4wNHMtMjEuNzQtMTIuNzEtMjEuODEtMjYuMThsLS4zOS02Ny40NC0xOC43Ni0uMzItLjA2LTI3LjU3LDE4LjgxLS4zMS0uMDYtMjguMzIsMzcuNTYuMDkuMDYsMjguMzQsMjQuNDEuMDguMDUsMjcuNzEtMjQuNTIuMjUuMSw1Ni4yNmMwLDQuOSwzLjMyLDguNjksNy4yNSwxMC45LDUuNzEsMS4wOSwxMC40NCwxLjE2LDE3LjE1LjQ1aDBaIi8+CiAgPC9nPgo8L3N2Zz4=" alt="ConextRouter" style="height:18px;width:auto;object-fit:contain;">
+    </a>
+    <nav class="nav-links">
+      <a href="index.html#produk" data-i18n="nav.produk">Produk</a>
+      <a href="index.html#cara-kerja" data-i18n="nav.cara_kerja">Cara Kerja</a>
+      <a href="index.html#faq" data-i18n="nav.faq">FAQ</a>
+      <a href="docs.html" class="active" data-i18n="nav.docs">Dokumentasi</a>
+    </nav>
+    <div class="nav-cta">
+      <div class="lang-switch">
+        <button class="lang-btn" id="langBtn" aria-haspopup="true" aria-expanded="false" type="button">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="7.2" stroke="currentColor" stroke-width="1.4"/><path d="M2.8 10h14.4M10 2.8c1.8 2 2.8 4.5 2.8 7.2s-1 5.2-2.8 7.2c-1.8-2-2.8-4.5-2.8-7.2s1-5.2 2.8-7.2z" stroke="currentColor" stroke-width="1.3"/></svg>
+          <span id="langBtnLabel">ID</span>
+          <svg width="10" height="10" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="lang-chev"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="lang-menu" id="langMenu" role="menu">
+          <button type="button" role="menuitem" data-lang="id"><span class="lang-flag">🇮🇩</span> Bahasa Indonesia</button>
+          <button type="button" role="menuitem" data-lang="en"><span class="lang-flag">🇬🇧</span> English</button>
+          <button type="button" role="menuitem" data-lang="zh"><span class="lang-flag">🇨🇳</span> 中文</button>
+        </div>
+      </div>
+      <a href="../dashboard/dashboard_full_v5_enterprise.html" class="btn btn-ghost" data-i18n="nav.masuk">Masuk</a>
+      <a href="index.html#produk" class="btn btn-dark" data-i18n="hero.cta1">Buat Akun Gratis</a>
+    </div>
+    <button class="nav-toggle" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 5H16M2 9H16M2 13H16" stroke="#1A1615" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</div>
+
+<main id="top">
+  <section class="docs-hero">
+    <div class="wrap">
+      <span class="docs-badge" data-i18n="docs.badge">Dokumentasi</span>
+      <h1 data-i18n="docs.h1">Semua yang kamu butuhkan untuk mulai membangun</h1>
+      <p class="lead" data-i18n="docs.lead">Panduan lengkap autentikasi, endpoint, model, contoh kode, dan penanganan error untuk mengintegrasikan ConextRouter ke aplikasimu.</p>
+      <div class="docs-hero-ctas">
+        <a href="#mulai-cepat" class="btn btn-dark" data-i18n="docs.cta_quickstart">Mulai Cepat</a>
+        <a href="#autentikasi" class="btn btn-light" data-i18n="docs.cta_auth">Lihat Autentikasi</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="docs-shell">
+      <aside class="docs-side">
+        <div class="docs-side-title" data-i18n="docs.toc.label">Di halaman ini</div>
+        <ul class="docs-toc" id="docsToc">
+          <li><a href="#mulai-cepat" data-i18n="docs.toc.quickstart">Mulai Cepat</a></li>
+          <li><a href="#autentikasi" data-i18n="docs.toc.auth">Autentikasi</a></li>
+          <li><a href="#base-url" data-i18n="docs.toc.baseurl">Base URL &amp; Kompatibilitas</a></li>
+          <li><a href="#model-routing" data-i18n="docs.toc.models">Model &amp; Routing Otomatis</a></li>
+          <li><a href="#contoh-kode" data-i18n="docs.toc.examples">Contoh Kode</a></li>
+          <li><a href="#format-respons" data-i18n="docs.toc.response">Format Respons</a></li>
+          <li><a href="#streaming" data-i18n="docs.toc.streaming">Streaming</a></li>
+          <li><a href="#error" data-i18n="docs.toc.errors">Penanganan Error</a></li>
+          <li><a href="#rate-limit" data-i18n="docs.toc.ratelimit">Rate Limit</a></li>
+          <li><a href="#harga" data-i18n="docs.toc.pricing">Harga &amp; Penagihan</a></li>
+          <li><a href="#dukungan" data-i18n="docs.toc.support">FAQ &amp; Dukungan</a></li>
+        </ul>
+      </aside>
+
+      <div class="docs-content">
+
+        <section class="doc-section" id="mulai-cepat">
+          <h2><span class="doc-num">1</span><span data-i18n="docs.qs.title">Mulai Cepat</span></h2>
+          <p class="doc-desc" data-i18n="docs.qs.desc">Tiga langkah untuk mengirim request pertamamu ke ConextRouter.</p>
+          <div class="doc-body">
+            <ol>
+              <li data-i18n="docs.qs.step1">Buat akun dan verifikasi email di dashboard.</li>
+              <li data-i18n="docs.qs.step2">Top up saldo, lalu buat API key baru dari menu API Keys.</li>
+              <li data-i18n="docs.qs.step3">Ganti base URL di SDK/kode kamu ke <code class="inline">api.conextrouter.id</code> dan gunakan API key sebagai Bearer token.</li>
+            </ol>
+          </div>
+          <div class="code-block-wrap">
+            <pre class="code-block"><span class="c-com"># Contoh request pertama kamu</span>
+curl <span class="c-str">https://api.conextrouter.id/v1/chat/completions</span> \
+  -H <span class="c-str">"Authorization: Bearer $CONEXTROUTER_API_KEY"</span> \
+  -H <span class="c-str">"Content-Type: application/json"</span> \
+  -d <span class="c-str">'{
+    "model": "conext-auto",
+    "messages": [{"role": "user", "content": "Halo, ConextRouter!"}]
+  }'</span></pre>
+          </div>
+        </section>
+
+        <section class="doc-section" id="autentikasi">
+          <h2><span class="doc-num">2</span><span data-i18n="docs.auth.title">Autentikasi</span></h2>
+          <div class="doc-body">
+            <p data-i18n="docs.auth.p1">Setiap request ke ConextRouter perlu disertai API key sebagai Bearer token pada header <code class="inline">Authorization</code>.</p>
+          </div>
+          <pre class="code-block">Authorization: Bearer cr-live-xxxxxxxxxxxxxxxxxxxxxxxx</pre>
+          <div class="doc-callout">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 2l7 3.2v4.8c0 4.4-2.9 8.2-7 9.4-4.1-1.2-7-5-7-9.4V5.2L10 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M10 7v4M10 13.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <p data-i18n-html="docs.auth.callout"><strong>Jaga kerahasiaan API key kamu.</strong> Jangan taruh API key di kode sisi client (browser/mobile). Simpan di environment variable server, dan buat API key terpisah untuk tiap environment (development, staging, production).</p>
+          </div>
+          <div class="doc-body">
+            <p data-i18n="docs.auth.p2">Kamu bisa membuat beberapa API key dari dashboard, masing-masing dengan limit pemakaian dan label sendiri, serta mencabutnya kapan saja tanpa memengaruhi API key lain.</p>
+          </div>
+        </section>
+
+        <section class="doc-section" id="base-url">
+          <h2><span class="doc-num">3</span><span data-i18n="docs.baseurl.title">Base URL &amp; Kompatibilitas</span></h2>
+          <div class="doc-body">
+            <p data-i18n="docs.baseurl.p1">ConextRouter kompatibel dengan format request OpenAI dan Anthropic, jadi pada banyak kasus kamu hanya perlu mengganti base URL di SDK yang sudah kamu pakai.</p>
+          </div>
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead><tr>
+                <th data-i18n="docs.baseurl.col_endpoint">Endpoint</th>
+                <th data-i18n="docs.baseurl.col_method">Method</th>
+                <th data-i18n="docs.baseurl.col_desc">Deskripsi</th>
+              </tr></thead>
+              <tbody>
+                <tr><td><code class="inline">/v1/chat/completions</code></td><td>POST</td><td data-i18n="docs.baseurl.row1">Format kompatibel OpenAI, mendukung chat &amp; tool calling.</td></tr>
+                <tr><td><code class="inline">/v1/messages</code></td><td>POST</td><td data-i18n="docs.baseurl.row2">Format kompatibel Anthropic Messages API.</td></tr>
+                <tr><td><code class="inline">/v1/models</code></td><td>GET</td><td data-i18n="docs.baseurl.row3">Daftar model yang tersedia beserta status ketersediaannya.</td></tr>
+                <tr><td><code class="inline">/v1/usage</code></td><td>GET</td><td data-i18n="docs.baseurl.row4">Ringkasan pemakaian token dan saldo untuk API key yang digunakan.</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="doc-body">
+            <p data-i18n="docs.baseurl.p2">Base URL: <code class="inline">https://api.conextrouter.id</code></p>
+          </div>
+        </section>
+
+        <section class="doc-section" id="model-routing">
+          <h2><span class="doc-num">4</span><span data-i18n="docs.models.title">Model &amp; Routing Otomatis</span></h2>
+          <div class="doc-body">
+            <p data-i18n="docs.models.p1">Secara default, kirim <code class="inline">"model": "conext-auto"</code> dan ConextRouter akan menilai kompleksitas setiap request lalu mengarahkannya ke salah satu tier berikut. Kamu juga bisa memaksa model tertentu dengan mengirim nama modelnya langsung.</p>
+          </div>
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead><tr>
+                <th data-i18n="docs.models.col_tier">Tier</th>
+                <th data-i18n="docs.models.col_use">Cocok untuk</th>
+                <th data-i18n="docs.models.col_latency">Latensi relatif</th>
+              </tr></thead>
+              <tbody>
+                <tr><td><span class="doc-model-badge">conext-flash</span></td><td data-i18n="docs.models.row1">Pertanyaan singkat, autocomplete, klasifikasi ringan</td><td data-i18n="docs.models.lat_low">Rendah</td></tr>
+                <tr><td><span class="doc-model-badge">conext-plus</span></td><td data-i18n="docs.models.row2">Tugas harian dengan kompleksitas sedang</td><td data-i18n="docs.models.lat_mid">Sedang</td></tr>
+                <tr><td><span class="doc-model-badge">conext-max</span></td><td data-i18n="docs.models.row3">Reasoning berat, analisis, dan tugas multi-langkah</td><td data-i18n="docs.models.lat_high">Lebih tinggi</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="doc-body">
+            <p data-i18n="docs.models.p2">Setiap respons menyertakan header <code class="inline">x-conext-model</code> yang menunjukkan model aktual yang menangani request, sehingga kamu tetap punya visibilitas penuh meski routing berjalan otomatis.</p>
+          </div>
+        </section>
+
+        <section class="doc-section" id="contoh-kode">
+          <h2><span class="doc-num">5</span><span data-i18n="docs.examples.title">Contoh Kode</span></h2>
+          <p class="doc-desc" data-i18n="docs.examples.desc">Pilih bahasa yang kamu pakai. Semua contoh menggunakan endpoint kompatibel OpenAI.</p>
+          <div class="code-tabs" role="tablist">
+            <button class="code-tab-btn active" data-tab="curl" type="button">cURL</button>
+            <button class="code-tab-btn" data-tab="python" type="button">Python</button>
+            <button class="code-tab-btn" data-tab="node" type="button">Node.js</button>
+          </div>
+          <div class="code-block-wrap">
+            <pre class="code-block code-panel active" data-panel="curl">curl <span class="c-str">https://api.conextrouter.id/v1/chat/completions</span> \
+  -H <span class="c-str">"Authorization: Bearer $CONEXTROUTER_API_KEY"</span> \
+  -H <span class="c-str">"Content-Type: application/json"</span> \
+  -d <span class="c-str">'{
+    "model": "conext-auto",
+    "messages": [
+      {"role": "user", "content": "Ringkas artikel ini dalam 3 poin."}
+    ]
+  }'</span></pre>
+            <pre class="code-block code-panel" data-panel="python"><span class="c-key">from</span> openai <span class="c-key">import</span> OpenAI
+
+client = OpenAI(
+    base_url=<span class="c-str">"https://api.conextrouter.id/v1"</span>,
+    api_key=<span class="c-str">"CONEXTROUTER_API_KEY"</span>
+)
+
+response = client.chat.completions.create(
+    model=<span class="c-str">"conext-auto"</span>,
+    messages=[
+        {<span class="c-str">"role"</span>: <span class="c-str">"user"</span>, <span class="c-str">"content"</span>: <span class="c-str">"Ringkas artikel ini dalam 3 poin."</span>}
+    ]
+)
+
+<span class="c-key">print</span>(response.choices[<span class="c-num">0</span>].message.content)</pre>
+            <pre class="code-block code-panel" data-panel="node"><span class="c-key">import</span> OpenAI <span class="c-key">from</span> <span class="c-str">"openai"</span>;
+
+<span class="c-key">const</span> client = <span class="c-key">new</span> OpenAI({
+  baseURL: <span class="c-str">"https://api.conextrouter.id/v1"</span>,
+  apiKey: <span class="c-str">process.env.CONEXTROUTER_API_KEY</span>,
+});
+
+<span class="c-key">const</span> response = <span class="c-key">await</span> client.chat.completions.create({
+  model: <span class="c-str">"conext-auto"</span>,
+  messages: [
+    { role: <span class="c-str">"user"</span>, content: <span class="c-str">"Ringkas artikel ini dalam 3 poin."</span> }
+  ],
+});
+
+console.log(response.choices[<span class="c-num">0</span>].message.content);</pre>
+          </div>
+        </section>
+
+        <section class="doc-section" id="format-respons">
+          <h2><span class="doc-num">6</span><span data-i18n="docs.response.title">Format Respons</span></h2>
+          <div class="doc-body">
+            <p data-i18n="docs.response.p1">Respons mengikuti struktur standar Chat Completions, dengan tambahan field <code class="inline">router</code> yang menjelaskan keputusan routing.</p>
+          </div>
+          <pre class="code-block">{
+  <span class="c-str">"id"</span>: <span class="c-str">"chatcmpl-8f2a1c"</span>,
+  <span class="c-str">"model"</span>: <span class="c-str">"qwen-plus"</span>,
+  <span class="c-str">"choices"</span>: [{
+    <span class="c-str">"index"</span>: <span class="c-num">0</span>,
+    <span class="c-str">"message"</span>: { <span class="c-str">"role"</span>: <span class="c-str">"assistant"</span>, <span class="c-str">"content"</span>: <span class="c-str">"..."</span> },
+    <span class="c-str">"finish_reason"</span>: <span class="c-str">"stop"</span>
+  }],
+  <span class="c-str">"usage"</span>: { <span class="c-str">"prompt_tokens"</span>: <span class="c-num">42</span>, <span class="c-str">"completion_tokens"</span>: <span class="c-num">118</span>, <span class="c-str">"total_tokens"</span>: <span class="c-num">160</span> },
+  <span class="c-str">"router"</span>: { <span class="c-str">"requested"</span>: <span class="c-str">"conext-auto"</span>, <span class="c-str">"selected_tier"</span>: <span class="c-str">"conext-plus"</span> }
+}</pre>
+        </section>
+
+        <section class="doc-section" id="streaming">
+          <h2><span class="doc-num">7</span><span data-i18n="docs.streaming.title">Streaming</span></h2>
+          <div class="doc-body">
+            <p data-i18n="docs.streaming.p1">Tambahkan <code class="inline">"stream": true</code> pada body request untuk menerima respons secara bertahap lewat Server-Sent Events (SSE), berguna untuk menampilkan jawaban token demi token di UI kamu.</p>
+          </div>
+          <pre class="code-block">curl <span class="c-str">https://api.conextrouter.id/v1/chat/completions</span> \
+  -H <span class="c-str">"Authorization: Bearer $CONEXTROUTER_API_KEY"</span> \
+  -d <span class="c-str">'{"model": "conext-auto", "stream": true, "messages": [...]}'</span></pre>
+        </section>
+
+        <section class="doc-section" id="error">
+          <h2><span class="doc-num">8</span><span data-i18n="docs.errors.title">Penanganan Error</span></h2>
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead><tr>
+                <th data-i18n="docs.errors.col_code">Kode</th>
+                <th data-i18n="docs.errors.col_meaning">Arti</th>
+                <th data-i18n="docs.errors.col_fix">Yang perlu dilakukan</th>
+              </tr></thead>
+              <tbody>
+                <tr><td><code class="inline">401</code></td><td data-i18n="docs.errors.e401">API key tidak valid atau hilang</td><td data-i18n="docs.errors.f401">Periksa header Authorization dan pastikan API key masih aktif</td></tr>
+                <tr><td><code class="inline">402</code></td><td data-i18n="docs.errors.e402">Saldo tidak mencukupi</td><td data-i18n="docs.errors.f402">Top up saldo dari dashboard</td></tr>
+                <tr><td><code class="inline">429</code></td><td data-i18n="docs.errors.e429">Rate limit terlampaui</td><td data-i18n="docs.errors.f429">Terapkan retry dengan backoff, lihat header rate limit</td></tr>
+                <tr><td><code class="inline">400</code></td><td data-i18n="docs.errors.e400">Body request tidak valid</td><td data-i18n="docs.errors.f400">Periksa format JSON dan field wajib</td></tr>
+                <tr><td><code class="inline">500</code></td><td data-i18n="docs.errors.e500">Kesalahan sisi server</td><td data-i18n="docs.errors.f500">Coba ulang, atau hubungi dukungan jika berlanjut</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <pre class="code-block">{
+  <span class="c-str">"error"</span>: {
+    <span class="c-str">"type"</span>: <span class="c-str">"insufficient_balance"</span>,
+    <span class="c-str">"message"</span>: <span class="c-str">"Saldo tidak mencukupi untuk memproses request ini."</span>
+  }
+}</pre>
+        </section>
+
+        <section class="doc-section" id="rate-limit">
+          <h2><span class="doc-num">9</span><span data-i18n="docs.ratelimit.title">Rate Limit</span></h2>
+          <div class="doc-body">
+            <p data-i18n="docs.ratelimit.p1">Batas rate limit mengikuti limit yang kamu atur per API key di dashboard. Setiap respons menyertakan header berikut agar kamu bisa memantau sisa kuota secara real-time:</p>
+            <ul>
+              <li><code class="inline">x-ratelimit-limit-requests</code></li>
+              <li><code class="inline">x-ratelimit-remaining-requests</code></li>
+              <li><code class="inline">x-ratelimit-reset-requests</code></li>
+            </ul>
+            <p data-i18n="docs.ratelimit.p2">Untuk kebutuhan throughput lebih tinggi, tim Enterprise dapat mengajukan penyesuaian limit sesuai kebutuhan.</p>
+          </div>
+        </section>
+
+        <section class="doc-section" id="harga">
+          <h2><span class="doc-num">10</span><span data-i18n="docs.pricing.title">Harga &amp; Penagihan</span></h2>
+          <div class="doc-body">
+            <p data-i18n="docs.pricing.p1">Personal dikenakan biaya prabayar berdasarkan token yang terpakai, dipotong langsung dari saldo. Enterprise menggunakan skema postpaid dengan satu invoice bulanan untuk seluruh tim.</p>
+          </div>
+          <div class="doc-card">
+            <p data-i18n-html="docs.pricing.p2">Lihat rincian paket dan cara top up di halaman <a href="index.html#harga" style="color:var(--accent);font-weight:600;">Harga</a>.</p>
+          </div>
+        </section>
+
+        <section class="doc-section" id="dukungan">
+          <h2><span class="doc-num">11</span><span data-i18n="docs.support.title">FAQ &amp; Dukungan</span></h2>
+          <div class="doc-body">
+            <p data-i18n="docs.support.p1">Pertanyaan umum seputar model, pembayaran, dan integrasi ada di halaman FAQ. Butuh bantuan lebih lanjut? Tim kami siap membantu.</p>
+          </div>
+          <div class="doc-support-grid">
+            <div class="doc-support-card">
+              <h4 data-i18n="docs.support.faq_title">Baca FAQ</h4>
+              <p data-i18n="docs.support.faq_desc">Jawaban singkat tentang model, harga, dan routing.</p>
+              <a href="index.html#faq" class="btn btn-light" style="padding:9px 16px;font-size:13px;" data-i18n="docs.support.faq_cta">Buka FAQ</a>
+            </div>
+            <div class="doc-support-card">
+              <h4 data-i18n="docs.support.contact_title">Hubungi Tim</h4>
+              <p data-i18n="docs.support.contact_desc">Untuk pertanyaan teknis atau kebutuhan Enterprise.</p>
+              <a href="index.html#harga" class="btn btn-light" style="padding:9px 16px;font-size:13px;" data-i18n="docs.support.contact_cta">Ajukan Enterprise</a>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="index.html#top" class="brand">
+          <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyBpZD0iTGF5ZXJfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB2ZXJzaW9uPSIxLjEiIHZpZXdCb3g9IjAgMCAxNDY3IDE2OS4yMSI+CiAgPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDMwLjYuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDIuMS40IEJ1aWxkIDEwOSkgIC0tPgogIDxkZWZzPgogICAgPHN0eWxlPgogICAgICAuc3QwIHsKICAgICAgICBmaWxsOiAjMTc1MmVkOwogICAgICB9CiAgICA8L3N0eWxlPgogIDwvZGVmcz4KICA8Zz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik04ODkuNTksMTY0Ljk4bC0zNC43OS0uMjUtMjguMTMtNTYuNzVoLTIzLjQ4bC4wNSw1My40MmMwLDEuMTctMi4zMiwzLjUtMy41NCwzLjVsLTMzLjY2LS4wMy0xLjI1LTEwLjc5LjA1LTE0OS44NSw3Ni40NC4yMmM5LjU1LjAzLDE4LjU3LDMuNDMsMjYuODgsNi45OSw5LjM5LDUuMDcsMTYuMjQsMTEuOTksMjAuNjksMjEuNzEsMTAuMywyNi4xMSwzLjE4LDU3LjI5LTIzLjM2LDY5LjA5bDMyLjA0LDYxLjZjLTEuOTEuNDktNS4zOCwxLjE2LTcuOTUsMS4xNGgwWk04NTMuOTcsNTYuODVjLjU3LTE0LjI1LTEwLjMzLTIzLjIzLTIzLjQxLTIzLjE4bC0yNy4zNS4xdjQ3LjEzbDMwLjkyLS4yOGMxMi40NS0uMTEsMjAuNzctMTEuMzYsMTkuODMtMjMuNzZoMFoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMDIwLjk5LDEzMC41M2MtMTEuMTksMzMuNDQtNDcuOTIsNDMuMDUtNzkuNzIsMzQuMTEtMzYuOTgtMTAuMzktNDYuOTMtNTIuOTctMzYuMjgtODYuNzUsMTEuMzYtMzYuMDYsNTIuNDUtNDYuNDUsODQuODEtMzQuMTIsMzMuOSwxMi45Miw0MS45OCw1NC41LDMxLjE4LDg2Ljc1aC4wMVpNOTg0LjAxLDgyLjk1Yy0zLjQ4LTEwLjAyLTExLjI5LTE1LjU0LTIwLjk3LTE1LjQ4cy0xNi45Niw1LjQtMjAuNDcsMTVjLTguMTQsMjIuMjUtMy4zMSw1NywyMC40OCw1Ni44NiwyNC40Ni0uMTQsMjguNy0zNC4xMiwyMC45Ni01Ni4zOGgwWiIvPgogICAgPHBhdGggY2xhc3M9InN0MCIgZD0iTTExNTMuODgsNDEuNjNsLS4wNCwxMjIuODMtMzcuMDEuNDktMS4wNS0xOS44OWMtOC4xMiwxNi41NC0yMS41OCwyMi45My0zOC4yOSwyMi42NS0yNi44Ni0uNDQtMzkuMTctMTguMzUtNDAuMDMtNDQuNTlsLS4wNS04MS4zMywzNy4xMy0uMTIuMTMsNzMuNTdjMCwzLjgyLDEuMDEsOC4zOCwyLjI0LDExLjQ0LDMuMTQsNy44LDkuOTIsMTAuNjgsMTcuNjIsMTAuNzEsMTEuODUuMDQsMjAuMDktNy40MiwyMS45NS0xOS41MmwuMDktNzUuOTksMzcuMzItLjIzdi0uMDJaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTI5OS4xNCwxMzYuNjZjOS40NCw3LjM0LDI5Ljk1LDUuNjIsMzguNDEtNy41NWwzMy4yNy4wNGMtOC4wMywzMy44OC00NC43OSw0My43My03Ni4xNCwzNi4yNy0xOC44OS00LjUtMzMuMjEtMTguMDUtMzguOTgtMzYuNTMtOS43Ny0zMS4yNy0xLjcxLTcxLjQxLDI5Ljg5LTg0LjY3LDE2LjcxLTcuMDEsMzYuMjEtNy4wNiw1Mi44Ny0uMTQsMjcuMywxMS4zNCwzNS40NCwzOS40MiwzMy4xNyw2OC4xbC04Mi45NC4xMWMtLjMyLDkuNDcsMi45NywxOC41NSwxMC40NSwyNC4zN2gwWk0xMzM3LjA2LDg5LjcxYy0xLjc0LTcuODMtNC4wNi0xNC45OC0xMC41MS0xOS42My04LjMzLTYuMDEtMjEuMDYtNS42OS0yOC45NSwxLjE3LTUuNDUsNC43NC03LjgzLDExLjY0LTguNzgsMTguNDhsNDguMjMtLjAyaC4wMVoiLz4KICAgIDxwYXRoIGNsYXNzPSJzdDAiIGQ9Ik0xMjQ0LjA1LDEzNy4wN2wtLjA1LDI3LjI1Yy0xMy4wNSwxLjItMjQuNTMsMS41MS0zNi41Ni0uNDctMTUuMzgtMi41My0yNS4xLTE0LjExLTI1LjE2LTI5LjhsLS4yNi02NC41Ny0xOC40Ny0uMjQtLjA4LTI3LjUyLDE4LjYtLjEyLS4wMi0yOC4zNCwzNy41LS4wNy0uMTYsMjguMjcsMjAuMjIuMjZjLjg1LDAsMi42My4yNywzLjIzLjYyLjc5LjQ1LDEuMjgsMi43LDEuMjcsMy43NWwtLjExLDIzLjE3LTI0LjQ0LjE4LjAyLDU1LjgyYzAsNC41LDIuNTcsOC40LDUuODYsMTAuOTYsNi4xMywxLjg1LDEwLjM1LDIsMTguNi44NGguMDFaIi8+CiAgICA8cGF0aCBjbGFzcz0ic3QwIiBkPSJNMTQxOC4yNCwxNjQuOTdsLTMzLjIxLS4zNC4wNy0xMjMuMDMsMzYuNjUuMTksMS4wNSwyMC4zOGM0LjgzLTkuMDYsNy44MS0xNS45NiwxNi40Mi0xOS4zOCw4LjgtMy40OSwxOC43Ny00LjAyLDI3Ljc4LTEuMTVsLS4wOCwzMWMtOS43OC0uODMtMTguMjQtMi41NS0yNy4wNS4xMS05Ljc3LDIuOTUtMTcuMzksMTEuNjYtMTcuNDIsMjIuMTlsLS4xNyw2Ni40MWMwLDEuMzctMi4zMiwzLjY0LTQuMDQsMy42MloiLz4KICA8L2c+CiAgPGc+CiAgICA8cGF0aCBkPSJNMTExLjM1LDEwNy45M2wzNy4zNi0uMThjLTEuMDIsMjYuNC0xNy42LDQ3LjM2LTQxLjQ2LDU2LjMyLTI5LjM0LDEwLjI3LTY2LjQ1LDUuNjUtODcuMjMtMTguMjctOC4zOC05LjY1LTEzLjk1LTIwLjc0LTE2Ljc4LTMzLjI2Qy00LjI4LDc5LjI2LjMsMzguOCwyNy40NCwxNi4yLDUwLjY2LTMuMTIsODkuNzgtNC45OCwxMTYuMDksOS42N2MxOS4zMSwxMC45MSwzMS44MywzMC4wNSwzMi41MSw1Mi43OGgtMzcuMjFjLTIuMDMtMTQuNzktMTEuNjQtMjYuMDctMjUuODctMjkuMjYtMTcuMS0zLjk1LTMzLjU0LDQuMjQtNDAuNDMsMjAuOTQtNy45LDE5LjE1LTcuOTYsNDIuMDUuMDgsNjEuMTcsNi41OSwxNS42OCwyMS41NiwyMy43NywzNy44LDIxLjQ3LDE0LjU3LTIuNTEsMjYuMTMtMTIuNTksMjguMzktMjguODNoMFoiLz4KICAgIDxwYXRoIGQ9Ik0yNzguMTgsMTI3LjgxYy05Ljg0LDM0Ljk5LTQ2LjcxLDQ2LTc5LjU3LDM3LjM0LTE3LjgzLTQuNy0zMS40Mi0xNy4xOS0zNy4yMS0zNC44LTUuMy0xNi4xMy01LjU5LTMzLjkxLTEuMDgtNTAuMzUsNS4zOS0xOS42NiwyMC40Ny0zNC4xNCw0MC4xLTM4LjgzLDMxLjM0LTcuNDgsNjUuNDgsMi43Myw3Ni42LDM0LjU4LDUuODUsMTYuNzYsNS45NywzNC45NSwxLjE2LDUyLjA1aDBaTTI0MC4wNCw4Mi45NWMtMy4zNi05LjQ4LTEwLjc4LTE1LjEyLTIwLjE3LTE1LjI5LTkuMTUtLjE3LTE3LjA4LDQuOTMtMjAuNzgsMTQuNDItNS4yOCwxMy41My01LjM0LDI5LjcuMTcsNDMuMjMsMy43Miw5LjEzLDExLjg1LDE0LjA5LDIwLjc0LDEzLjg5LDIzLjE2LS41MywyNy45OS0zMy44MywyMC4wNS01Ni4yNWgtLjAxWiIvPgogICAgPHBhdGggZD0iTTM2NC4xMyw3Mi4wMmMtNi4zLTMuNDgtMTQuODQtMy4zMy0yMC44NC0uMDctNy43NCw0LjE5LTEwLjc3LDEyLjI4LTExLjM5LDIwLjc0bC0uMDQsNzIuMjhoLTM3LjM0VjQxLjY2bDM3LjA1LS4wNy43OSwyMC4yOGM3LjkzLTE2LjA3LDIwLjY2LTIzLjI5LDM3LjI1LTIyLjg5LDEwLjk2LjI3LDIxLjczLDIuNDcsMjkuNTMsMTAuNyw4LjU4LDkuMDQsMTEsMjAuNzUsMTIuMDMsMzMuMjZsLjEsODIuMDRoLTM3LjY2bC0uMDUtNzYuNjhjLTEuMDQtNi40NS0zLjE0LTEyLjgxLTkuNDItMTYuMjloMFoiLz4KICAgIDxwYXRoIGQ9Ik00ODUuMDQsMTQwLjY3YzkuNi4yMywxOC4wMi0zLjQ2LDIyLjk0LTExLjUybDM0LjIzLS4wNmMtOC4yOSwzNC41Ni00NS45NSw0NC4yNS03Ny43MiwzNi4xNy0zNi44Ni05LjM4LTQ3LjgtNTAuMzctMzguMzktODUuMjIsNy4yNS0yNi44NiwzMC41Mi00MS4yOCw1Ny40NS00MS4yOSwyOC43Ni0uMDIsNTMuMjksMTcuMjIsNTguMTIsNDYuNzUsMS4zNyw4LjM5LDEuNTksMTcuMzMsMS42LDI2LjY5bC04My4yNS4wOWMtLjcxLDE1LjE0LDguNDMsMjguNywyNS4wMiwyOC40aDBaTTUwNy44MSw4OS42NmMtMS4xMS02LjMxLTIuNzQtMTEuNzItNi42LTE2LjE5LTYuNi03LjY1LTE3LjQ1LTkuNTItMjcuMDUtNS40LTcuNjQsMy4yNy0xMy44MiwxMi40NS0xMy41LDIxLjU4aDQ3LjE1WiIvPgogICAgPHBvbHlnb24gcG9pbnRzPSI2NjUuODUgMTY0LjkxIDYyNS4wMyAxNjUuMDMgNjAzLjMzIDEyNS4wOSA1ODEuNjMgMTY0Ljk4IDU0Mi42NiAxNjQuODEgNTgwLjAxIDEwNC4yIDU0Mi4yNSA0MS42MyA1ODQuNzUgNDEuNTcgNjA0Ljk5IDgyLjAzIDYyNS4zNyA0MS41NiA2NjUuOTkgNDEuNjIgNjI4LjA5IDEwMi42NyA2NjUuODUgMTY0LjkxIi8+CiAgICA8cGF0aCBkPSJNNzQ3LjMzLDEzNy4xN3YyNy4xYy0xMy40MywxLjc0LTI2LjYxLDEuOTYtMzkuNzgtMS4wNHMtMjEuNzQtMTIuNzEtMjEuODEtMjYuMThsLS4zOS02Ny40NC0xOC43Ni0uMzItLjA2LTI3LjU3LDE4LjgxLS4zMS0uMDYtMjguMzIsMzcuNTYuMDkuMDYsMjguMzQsMjQuNDEuMDguMDUsMjcuNzEtMjQuNTIuMjUuMSw1Ni4yNmMwLDQuOSwzLjMyLDguNjksNy4yNSwxMC45LDUuNzEsMS4wOSwxMC40NCwxLjE2LDE3LjE1LjQ1aDBaIi8+CiAgPC9nPgo8L3N2Zz4=" alt="ConextRouter" style="height:20px;width:auto;object-fit:contain;">
+        </a>
+        <p data-i18n="footer.tagline">Gateway API AI dari Ralali.</p>
+      </div>
+      <div class="foot-col">
+        <h5 data-i18n="footer.col1.title">Produk</h5>
+        <ul><li><a href="index.html#produk" data-i18n="prod.p1.tag">Personal</a></li><li><a href="index.html#produk" data-i18n="price.ent.tag">Enterprise</a></li></ul>
+      </div>
+      <div class="foot-col">
+        <h5 data-i18n="footer.col2.title">Developer</h5>
+        <ul><li><a href="docs.html" data-i18n="nav.docs">Dokumentasi</a></li><li><a href="#" data-i18n="footer.status">Status</a></li></ul>
+      </div>
+      <div class="foot-col">
+        <h5 data-i18n="footer.col3.title">Perusahaan</h5>
+        <ul><li><a href="#" data-i18n="footer.tentang">Tentang</a></li><li><a href="#" data-i18n="footer.kontak">Kontak</a></li></ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <p data-i18n="footer.copyright">© 2026 ConextRouter. Seluruh hak cipta dilindungi.</p>
+      <div class="powered-badge">
+        <span data-i18n="footer.powered_by">Powered by</span>
+        <img src="images/ralalgroup.svg" alt="Ralali" class="powered-logo ralali">
+        <span class="powered-divider"></span>
+        <img src="images/AlibabaCloudLogo.svg" alt="Alibaba Cloud" class="powered-logo alibaba">
+      </div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+var CR_I18N = {
+id: {
+"nav.produk":"Produk","nav.cara_kerja":"Cara Kerja","nav.faq":"FAQ","nav.docs":"Dokumentasi","nav.masuk":"Masuk",
+"hero.eyebrow":"Didukung","hero.title":"Satu API.<br>Semua model AI.","hero.lead":"Top up saldo, buat API key, lalu langsung pakai. ConextRouter otomatis memilih model yang paling sesuai untuk setiap request, jadi kamu bisa fokus membangun produk.","hero.cta1":"Buat Akun Gratis","hero.cta2":"Lihat Cara Kerja",
+"mock.dashboard_title":"Dashboard","mock.saldo":"Saldo Aktif","mock.token":"Token Terpakai","mock.apikeys":"API Keys Aktif","mock.live":"Live","mock.aktif":"Aktif","mock.otomatis":"Otomatis",
+"why.eyebrow":"Kenapa ConextRouter","why.title":"Apa bedanya dengan router AI lain?","why.desc":"Banyak router AI dirancang untuk pasar global. ConextRouter dibuat lebih praktis untuk kebutuhan pengguna di Indonesia.",
+"why.col1":"Router<br>Self-Host","why.col2":"Router<br>Marketplace Global","why.col3":"Router<br>Enterprise Global",
+"why.r1.label":"Cara pilih model","why.r1.c1":"Manual, diatur sendiri melalui konfigurasi","why.r1.c2":"Manual, pilih model sendiri","why.r1.c3":"Manual atau routing otomatis dasar","why.r1.c4":"Otomatis sesuai kompleksitas tugas",
+"why.r2.label":"Mata uang & harga","why.r2.c1":"Gratis, tetapi biaya infrastruktur ditanggung sendiri","why.r2.c2":"USD + sekitar 5% biaya transaksi","why.r2.c3":"USD, mulai US$49/bulan","why.r2.c4":"Rupiah dengan harga yang transparan",
+"why.r3.label":"Metode bayar","why.r3.c1":"Kartu kredit langsung ke provider AI","why.r3.c2":"Kartu kredit internasional","why.r3.c3":"Kartu kredit atau invoice perusahaan","why.r3.c4":"QRIS, VA, atau e-wallet lokal",
+"why.r4.label":"Setup & infrastruktur","why.r4.c1":"Self-host, kelola server dan database sendiri","why.r4.c2":"Managed cloud, tanpa opsi penyimpanan data lokal","why.r4.c3":"Managed cloud dengan setup lebih kompleks","why.r4.c4":"Terkelola, siap pakai, didukung Alibaba Cloud",
+"why.r5.label":"Ekosistem AI","why.r5.c1":"Berdiri sendiri, tanpa ekosistem produk lain","why.r5.c2":"Berdiri sendiri, tanpa integrasi ekosistem lokal","why.r5.c3":"Bagian dari platform global, bukan ekosistem lokal","why.r5.c4":"Terhubung ekosistem AI Ralali Group (AIRIN, ConextLab)",
+"why.note":"Berdasarkan riset pola umum router/gateway AI global per Agustus 2026 — nama platform disamarkan.",
+"how.eyebrow":"Cara Kerja","how.title":"Mulai dalam tiga langkah","how.desc":"Tanpa migrasi besar. Cukup sesuaikan integrasi dan lanjutkan dengan kode yang sudah ada.",
+"how.s1.title":"Buat akun","how.s1.desc":"Daftar dan verifikasi email.",
+"how.s2.title":"Buat API key","how.s2.desc":"Atur limit pemakaian, lalu buat API key.",
+"how.s3.title":"Mulai kirim request","how.s3.desc":"Ganti base URL, lalu gunakan kode yang sudah ada.",
+"dashsec.eyebrow":"Dashboard","dashsec.title":"Pantau semuanya dari satu dashboard","dashsec.desc":"Lihat saldo, pemakaian, dan API key dalam satu tempat.",
+"prod.eyebrow":"Produk","prod.title":"Satu platform untuk berbagai skala","prod.desc":"Pilih skema penggunaan sesuai kebutuhan, dari developer individu hingga tim perusahaan.",
+"prod.p1.tag":"Personal","prod.p1.h3":"Untuk Developer Individu","prod.p1.desc":"Akses berbagai model AI lewat satu API key tanpa perlu mendaftar ke setiap provider. Cukup top up saldo, buat API key, lalu mulai kirim request. Cocok untuk developer individu, tim kecil, dan side project.",
+"prod.p1.li1":"Satu API key untuk mengakses berbagai model AI","prod.p1.li2":"Top up mulai Rp50.000 via QRIS, VA, atau e-wallet","prod.p1.li3":"Routing otomatis sesuai kompleksitas setiap request","prod.p1.li4":"Buat beberapa API key sesuai kebutuhan",
+"prod.p1.mock.workspace":"Workspace Personal","prod.p1.mock.users":"1 pengguna","prod.p1.mock.routing_label":"Routing Model",
+"prod.p1.route1":"Pertanyaan singkat & cepat","prod.p1.route2":"Tugas harian, kompleksitas sedang","prod.p1.route3":"Reasoning & analisis berat",
+"prod.p2.tag":"Enterprise · Postpaid","prod.p2.h3":"Untuk Tim &amp; Perusahaan","prod.p2.desc":"Kelola pemakaian AI seluruh tim dengan skema postpaid. Penggunaan dihitung berdasarkan token dan ditagih melalui satu invoice bulanan, dengan akses dan budget yang dapat diatur untuk setiap user atau tim.",
+"prod.p2.li1":"Seluruh pemakaian tim dalam satu invoice bulanan","prod.p2.li2":"Atur role dan budget per user atau tim","prod.p2.li3":"Sesuaikan limit kredit dengan kebutuhan perusahaan","prod.p2.li4":"SLA dan dukungan teknis prioritas","prod.p2.cta":"Ajukan Enterprise",
+"prod.p2.mock.usage_label":"Pemakaian Bulan Ini","prod.p2.mock.members_label":"Anggota Tim","prod.p2.mock.members_value":"12 users","prod.p2.mock.invoice_label":"Invoice Terakhir","prod.p2.mock.invoice_value":"#INV-0842 · Lunas",
+"price.eyebrow":"Harga","price.title":"Pilih skema sesuai kebutuhan","price.desc":"Mulai dengan Personal, lalu beralih ke Enterprise saat kebutuhan tim berkembang.",
+"price.personal.value":"Top up mulai Rp50.000","price.personal.sub":"Bayar sesuai pemakaian",
+"price.personal.li1":"Akses berbagai model AI melalui satu API key","price.personal.li2":"Top up via QRIS, VA, atau e-wallet","price.personal.li3":"Routing otomatis sesuai kompleksitas tugas","price.personal.li4":"Buat beberapa API key sesuai kebutuhan","price.personal.li5":"Tanpa kontrak atau biaya langganan bulanan",
+"price.badge":"Rekomendasi","price.ent.tag":"Enterprise","price.ent.value":"Custom","price.ent.sub":"Ditagih bulanan lewat satu invoice",
+"price.ent.li1":"Semua fitur Personal untuk seluruh tim","price.ent.li2":"Satu invoice bulanan tanpa top up manual","price.ent.li3":"Atur role dan budget per user atau tim","price.ent.li4":"Limit kredit sesuai skala perusahaan","price.ent.li5":"SLA dan dukungan teknis prioritas",
+"faq.h2":"FAQ","faq.desc":"Jawaban singkat tentang model, pembayaran, routing, dan integrasi.",
+"faq.q1":"Apa itu ConextRouter?","faq.a1":"Gateway API yang menghubungkan aplikasimu ke berbagai model AI lewat satu API key.",
+"faq.q2":"Model AI apa yang tersedia?","faq.a2":"Tersedia berbagai model dari OpenAI, Google Gemini, Anthropic Claude, Alibaba Qwen, DeepSeek, dan provider lainnya. Daftar model akan terus diperbarui.",
+"faq.q3":"Bagaimana ConextRouter memilih model AI?","faq.a3":"Sistem menilai kompleksitas setiap request lalu mengarahkannya ke model yang sesuai. Tugas sederhana menggunakan model yang lebih ringan, sedangkan tugas kompleks diarahkan ke model dengan kemampuan reasoning lebih tinggi.",
+"faq.q4":"Bagaimana cara bayar?","faq.a4":"Personal dapat top up melalui QRIS, VA, atau e-wallet. Untuk Enterprise tersedia skema tagihan bulanan.",
+"faq.q5":"Apakah perlu banyak perubahan kode?","faq.a5":"ConextRouter kompatibel dengan format OpenAI dan Anthropic. Pada banyak kasus, cukup ganti base URL.",
+"final.title":"Siap mulai dengan ConextRouter?","final.desc":"Buat akun gratis. Saat kebutuhan tim berkembang, beralih ke Enterprise kapan saja.",
+"footer.tagline":"Gateway API AI dari Ralali.","footer.col1.title":"Produk","footer.col2.title":"Developer","footer.col3.title":"Perusahaan",
+"footer.status":"Status","footer.tentang":"Tentang","footer.kontak":"Kontak","footer.copyright":"© 2026 ConextRouter. Seluruh hak cipta dilindungi.","footer.powered_by":"Powered by"
+},
+en: {
+"nav.produk":"Product","nav.cara_kerja":"How It Works","nav.faq":"FAQ","nav.docs":"Docs","nav.masuk":"Log In",
+"hero.eyebrow":"Powered by","hero.title":"One API.<br>Every AI model.","hero.lead":"Top up your balance, create an API key, and start using it right away. ConextRouter automatically picks the best-fit model for every request, so you can focus on building your product.","hero.cta1":"Create Free Account","hero.cta2":"See How It Works",
+"mock.dashboard_title":"Dashboard","mock.saldo":"Active Balance","mock.token":"Tokens Used","mock.apikeys":"Active API Keys","mock.live":"Live","mock.aktif":"Active","mock.otomatis":"Automatic",
+"why.eyebrow":"Why ConextRouter","why.title":"How is it different from other AI routers?","why.desc":"Most AI routers are built for the global market. ConextRouter is built to be more practical for users in Indonesia.",
+"why.col1":"Self-Host<br>Router","why.col2":"Global Marketplace<br>Router","why.col3":"Global Enterprise<br>Router",
+"why.r1.label":"Choosing a model","why.r1.c1":"Manual, set up yourself through configuration","why.r1.c2":"Manual, you pick the model yourself","why.r1.c3":"Manual or basic automatic routing","why.r1.c4":"Automatic based on task complexity",
+"why.r2.label":"Currency & pricing","why.r2.c1":"Free, but you cover the infrastructure cost yourself","why.r2.c2":"USD + around 5% transaction fee","why.r2.c3":"USD, starting at US$49/month","why.r2.c4":"Rupiah with transparent pricing",
+"why.r3.label":"Payment method","why.r3.c1":"Credit card straight to the AI provider","why.r3.c2":"International credit card","why.r3.c3":"Credit card or company invoice","why.r3.c4":"QRIS, virtual account, or local e-wallet",
+"why.r4.label":"Setup & infrastructure","why.r4.c1":"Self-hosted, you manage your own server and database","why.r4.c2":"Managed cloud, no local data-residency option","why.r4.c3":"Managed cloud with more complex setup","why.r4.c4":"Fully managed, ready to use, backed by Alibaba Cloud",
+"why.r5.label":"AI ecosystem","why.r5.c1":"Standalone, no wider product ecosystem","why.r5.c2":"Standalone, no local ecosystem integration","why.r5.c3":"Part of a global platform, not a local ecosystem","why.r5.c4":"Connected to the Ralali Group AI ecosystem (AIRIN, ConextLab)",
+"why.note":"Based on general patterns among global AI routers/gateways as of August 2026 — platform names withheld.",
+"how.eyebrow":"How It Works","how.title":"Get started in three steps","how.desc":"No major migration needed. Just adjust your integration and keep using the code you already have.",
+"how.s1.title":"Create an account","how.s1.desc":"Sign up and verify your email.",
+"how.s2.title":"Create an API key","how.s2.desc":"Set your usage limit, then generate an API key.",
+"how.s3.title":"Start sending requests","how.s3.desc":"Swap the base URL, then reuse your existing code.",
+"dashsec.eyebrow":"Dashboard","dashsec.title":"Monitor everything from one dashboard","dashsec.desc":"See your balance, usage, and API keys in a single place.",
+"prod.eyebrow":"Product","prod.title":"One platform for every scale","prod.desc":"Pick the plan that fits your needs, from individual developers to enterprise teams.",
+"prod.p1.tag":"Personal","prod.p1.h3":"For Individual Developers","prod.p1.desc":"Access a wide range of AI models through a single API key, with no need to sign up with every provider separately. Just top up your balance, create an API key, and start sending requests. Great for individual developers, small teams, and side projects.",
+"prod.p1.li1":"One API key to access many AI models","prod.p1.li2":"Top up from Rp50,000 via QRIS, virtual account, or e-wallet","prod.p1.li3":"Automatic routing based on each request's complexity","prod.p1.li4":"Create as many API keys as you need",
+"prod.p1.mock.workspace":"Personal Workspace","prod.p1.mock.users":"1 user","prod.p1.mock.routing_label":"Model Routing",
+"prod.p1.route1":"Quick, short questions","prod.p1.route2":"Everyday tasks, medium complexity","prod.p1.route3":"Heavy reasoning & analysis",
+"prod.p2.tag":"Enterprise · Postpaid","prod.p2.h3":"For Teams &amp; Companies","prod.p2.desc":"Manage your whole team's AI usage with a postpaid plan. Usage is calculated by token and billed through a single monthly invoice, with configurable access and budget per user or team.",
+"prod.p2.li1":"All of your team's usage in one monthly invoice","prod.p2.li2":"Set roles and budgets per user or team","prod.p2.li3":"Adjust credit limits to fit your company's needs","prod.p2.li4":"Priority SLA and technical support","prod.p2.cta":"Talk to Enterprise Sales",
+"prod.p2.mock.usage_label":"Usage This Month","prod.p2.mock.members_label":"Team Members","prod.p2.mock.members_value":"12 users","prod.p2.mock.invoice_label":"Last Invoice","prod.p2.mock.invoice_value":"#INV-0842 · Paid",
+"price.eyebrow":"Pricing","price.title":"Pick the plan that fits","price.desc":"Start with Personal, then move to Enterprise as your team's needs grow.",
+"price.personal.value":"Top up from Rp50,000","price.personal.sub":"Pay as you go",
+"price.personal.li1":"Access many AI models through a single API key","price.personal.li2":"Top up via QRIS, virtual account, or e-wallet","price.personal.li3":"Automatic routing based on task complexity","price.personal.li4":"Create as many API keys as you need","price.personal.li5":"No contract or monthly subscription fee",
+"price.badge":"Recommended","price.ent.tag":"Enterprise","price.ent.value":"Custom","price.ent.sub":"Billed monthly through a single invoice",
+"price.ent.li1":"Everything in Personal, for your whole team","price.ent.li2":"One monthly invoice, no manual top ups","price.ent.li3":"Set roles and budgets per user or team","price.ent.li4":"Credit limits that scale with your company","price.ent.li5":"Priority SLA and technical support",
+"faq.h2":"FAQ","faq.desc":"Quick answers about models, payments, routing, and integration.",
+"faq.q1":"What is ConextRouter?","faq.a1":"An API gateway that connects your app to a wide range of AI models through a single API key.",
+"faq.q2":"Which AI models are available?","faq.a2":"Models from OpenAI, Google Gemini, Anthropic Claude, Alibaba Qwen, DeepSeek, and other providers are available. The model list keeps growing.",
+"faq.q3":"How does ConextRouter choose a model?","faq.a3":"The system evaluates the complexity of each request and routes it to a matching model. Simple tasks use a lighter model, while complex tasks are routed to a model with stronger reasoning capability.",
+"faq.q4":"How do I pay?","faq.a4":"Personal accounts can top up via QRIS, virtual account, or e-wallet. A monthly billing plan is available for Enterprise.",
+"faq.q5":"Do I need to change a lot of code?","faq.a5":"ConextRouter is compatible with the OpenAI and Anthropic formats. In most cases, just swap the base URL.",
+"final.title":"Ready to get started with ConextRouter?","final.desc":"Create a free account. Move to Enterprise anytime your team's needs grow.",
+"footer.tagline":"An AI API gateway from Ralali.","footer.col1.title":"Product","footer.col2.title":"Developer","footer.col3.title":"Company",
+"footer.status":"Status","footer.tentang":"About","footer.kontak":"Contact","footer.copyright":"© 2026 ConextRouter. All rights reserved.","footer.powered_by":"Powered by"
+},
+zh: {
+"nav.produk":"产品","nav.cara_kerja":"工作原理","nav.faq":"常见问题","nav.docs":"文档","nav.masuk":"登录",
+"hero.eyebrow":"技术支持","hero.title":"一个 API。<br>接入所有 AI 模型。","hero.lead":"充值余额，创建 API 密钥，即刻开始使用。ConextRouter 会为每个请求自动选择最合适的模型，让你专注于产品开发。","hero.cta1":"免费注册","hero.cta2":"查看工作原理",
+"mock.dashboard_title":"仪表盘","mock.saldo":"可用余额","mock.token":"已用 Token","mock.apikeys":"活跃 API 密钥","mock.live":"实时","mock.aktif":"启用中","mock.otomatis":"自动",
+"why.eyebrow":"为什么选择 ConextRouter","why.title":"和其他 AI 路由平台有什么不同？","why.desc":"许多 AI 路由平台是为全球市场设计的，而 ConextRouter 专为印尼用户的实际需求打造。",
+"why.col1":"自建<br>路由平台","why.col2":"全球市场化<br>路由平台","why.col3":"全球企业级<br>路由平台",
+"why.r1.label":"模型选择方式","why.r1.c1":"手动，需自行配置","why.r1.c2":"手动，自行选择模型","why.r1.c3":"手动或基础自动路由","why.r1.c4":"根据任务复杂度自动路由",
+"why.r2.label":"货币与价格","why.r2.c1":"免费，但基础设施成本需自行承担","why.r2.c2":"美元计价，另收约 5% 交易手续费","why.r2.c3":"美元计价，起价每月 49 美元","why.r2.c4":"印尼盾计价，价格透明",
+"why.r3.label":"支付方式","why.r3.c1":"信用卡直接支付给 AI 服务商","why.r3.c2":"国际信用卡","why.r3.c3":"信用卡或企业发票","why.r3.c4":"QRIS、虚拟账户或本地电子钱包",
+"why.r4.label":"部署与基础设施","why.r4.c1":"自建部署，自行管理服务器与数据库","why.r4.c2":"托管云服务，无本地数据存储选项","why.r4.c3":"托管云服务，部署较复杂","why.r4.c4":"全托管、开箱即用，由阿里云提供支持",
+"why.r5.label":"AI 生态","why.r5.c1":"独立运作，无更广泛的产品生态","why.r5.c2":"独立运作，未与本地生态整合","why.r5.c3":"属于全球平台的一部分，非本地生态","why.r5.c4":"接入 Ralali 集团 AI 生态（AIRIN、ConextLab）",
+"why.note":"基于截至 2026 年 8 月全球 AI 路由/网关平台的一般模式整理，平台名称已隐去。",
+"how.eyebrow":"工作原理","how.title":"三步即可开始","how.desc":"无需大规模迁移，只需调整对接方式，即可继续使用现有代码。",
+"how.s1.title":"创建账户","how.s1.desc":"注册并验证邮箱。",
+"how.s2.title":"创建 API 密钥","how.s2.desc":"设置用量限额，然后创建 API 密钥。",
+"how.s3.title":"开始发送请求","how.s3.desc":"替换 base URL，即可复用现有代码。",
+"dashsec.eyebrow":"仪表盘","dashsec.title":"在一个仪表盘中掌握全部信息","dashsec.desc":"在同一界面查看余额、用量与 API 密钥。",
+"prod.eyebrow":"产品","prod.title":"一个平台，适配各种规模","prod.desc":"根据需求选择合适的方案，从个人开发者到企业团队皆可适用。",
+"prod.p1.tag":"个人版","prod.p1.h3":"面向个人开发者","prod.p1.desc":"通过一个 API 密钥即可访问多种 AI 模型，无需分别向每个服务商注册。只需充值余额、创建 API 密钥，即可开始发送请求，适合个人开发者、小型团队与副业项目。",
+"prod.p1.li1":"一个 API 密钥即可访问多种 AI 模型","prod.p1.li2":"最低 5 万印尼盾起充，支持 QRIS、虚拟账户或电子钱包","prod.p1.li3":"根据每个请求的复杂度自动路由","prod.p1.li4":"可按需创建多个 API 密钥",
+"prod.p1.mock.workspace":"个人工作区","prod.p1.mock.users":"1 位用户","prod.p1.mock.routing_label":"模型路由",
+"prod.p1.route1":"简短快速的提问","prod.p1.route2":"日常任务，中等复杂度","prod.p1.route3":"高强度推理与分析",
+"prod.p2.tag":"企业版 · 后付费","prod.p2.h3":"面向团队与企业","prod.p2.desc":"以后付费方式管理整个团队的 AI 用量。用量按 Token 计算，通过每月一张账单结算，并可为每位用户或团队设置访问权限与预算。",
+"prod.p2.li1":"团队全部用量汇总为一张月度账单","prod.p2.li2":"按用户或团队设置角色与预算","prod.p2.li3":"根据企业需求调整信用额度","prod.p2.li4":"优先 SLA 与技术支持","prod.p2.cta":"咨询企业版",
+"prod.p2.mock.usage_label":"本月用量","prod.p2.mock.members_label":"团队成员","prod.p2.mock.members_value":"12 位用户","prod.p2.mock.invoice_label":"最近账单","prod.p2.mock.invoice_value":"#INV-0842 · 已付款",
+"price.eyebrow":"价格","price.title":"选择适合的方案","price.desc":"从个人版开始，随着团队需求增长再升级到企业版。",
+"price.personal.value":"最低 5 万印尼盾起充","price.personal.sub":"按实际用量付费",
+"price.personal.li1":"通过一个 API 密钥访问多种 AI 模型","price.personal.li2":"支持 QRIS、虚拟账户或电子钱包充值","price.personal.li3":"根据任务复杂度自动路由","price.personal.li4":"可按需创建多个 API 密钥","price.personal.li5":"无合约、无月度订阅费用",
+"price.badge":"推荐","price.ent.tag":"企业版","price.ent.value":"定制报价","price.ent.sub":"按月通过一张账单结算",
+"price.ent.li1":"包含个人版全部功能，适用于整个团队","price.ent.li2":"每月一张账单，无需手动充值","price.ent.li3":"按用户或团队设置角色与预算","price.ent.li4":"信用额度可随企业规模调整","price.ent.li5":"优先 SLA 与技术支持",
+"faq.h2":"常见问题","faq.desc":"关于模型、支付、路由与对接方式的简要解答。",
+"faq.q1":"什么是 ConextRouter？","faq.a1":"一个 API 网关，通过一个 API 密钥将你的应用连接到多种 AI 模型。",
+"faq.q2":"支持哪些 AI 模型？","faq.a2":"支持来自 OpenAI、Google Gemini、Anthropic Claude、阿里云通义千问、DeepSeek 等服务商的多种模型，模型列表持续更新。",
+"faq.q3":"ConextRouter 如何选择模型？","faq.a3":"系统会评估每个请求的复杂度，并将其路由到合适的模型：简单任务使用更轻量的模型，复杂任务则路由到推理能力更强的模型。",
+"faq.q4":"如何付款？","faq.a4":"个人版可通过 QRIS、虚拟账户或电子钱包充值；企业版提供按月账单结算方案。",
+"faq.q5":"是否需要大量修改代码？","faq.a5":"ConextRouter 兼容 OpenAI 与 Anthropic 的接口格式，多数情况下只需替换 base URL 即可。",
+"final.title":"准备好开始使用 ConextRouter 了吗？","final.desc":"免费注册账户，待团队需求增长后随时升级到企业版。",
+"footer.tagline":"来自 Ralali 的 AI API 网关。","footer.col1.title":"产品","footer.col2.title":"开发者","footer.col3.title":"公司",
+"footer.status":"服务状态","footer.tentang":"关于我们","footer.kontak":"联系我们","footer.copyright":"© 2026 ConextRouter。保留所有权利。","footer.powered_by":"技术支持"
+}
+};
+
+var CR_I18N_DOCS = {
+id: {
+"docs.badge":"Dokumentasi","docs.h1":"Semua yang kamu butuhkan untuk mulai membangun","docs.lead":"Panduan lengkap autentikasi, endpoint, model, contoh kode, dan penanganan error untuk mengintegrasikan ConextRouter ke aplikasimu.","docs.cta_quickstart":"Mulai Cepat","docs.cta_auth":"Lihat Autentikasi",
+"docs.toc.label":"Di halaman ini","docs.toc.quickstart":"Mulai Cepat","docs.toc.auth":"Autentikasi","docs.toc.baseurl":"Base URL & Kompatibilitas","docs.toc.models":"Model & Routing Otomatis","docs.toc.examples":"Contoh Kode","docs.toc.response":"Format Respons","docs.toc.streaming":"Streaming","docs.toc.errors":"Penanganan Error","docs.toc.ratelimit":"Rate Limit","docs.toc.pricing":"Harga & Penagihan","docs.toc.support":"FAQ & Dukungan",
+"docs.qs.title":"Mulai Cepat","docs.qs.desc":"Tiga langkah untuk mengirim request pertamamu ke ConextRouter.","docs.qs.step1":"Buat akun dan verifikasi email di dashboard.","docs.qs.step2":"Top up saldo, lalu buat API key baru dari menu API Keys.","docs.qs.step3":"Ganti base URL di SDK/kode kamu ke api.conextrouter.id dan gunakan API key sebagai Bearer token.",
+"docs.auth.title":"Autentikasi","docs.auth.p1":"Setiap request ke ConextRouter perlu disertai API key sebagai Bearer token pada header Authorization.","docs.auth.callout":"<strong>Jaga kerahasiaan API key kamu.</strong> Jangan taruh API key di kode sisi client (browser/mobile). Simpan di environment variable server, dan buat API key terpisah untuk tiap environment (development, staging, production).","docs.auth.p2":"Kamu bisa membuat beberapa API key dari dashboard, masing-masing dengan limit pemakaian dan label sendiri, serta mencabutnya kapan saja tanpa memengaruhi API key lain.",
+"docs.baseurl.title":"Base URL & Kompatibilitas","docs.baseurl.p1":"ConextRouter kompatibel dengan format request OpenAI dan Anthropic, jadi pada banyak kasus kamu hanya perlu mengganti base URL di SDK yang sudah kamu pakai.","docs.baseurl.col_endpoint":"Endpoint","docs.baseurl.col_method":"Method","docs.baseurl.col_desc":"Deskripsi","docs.baseurl.row1":"Format kompatibel OpenAI, mendukung chat & tool calling.","docs.baseurl.row2":"Format kompatibel Anthropic Messages API.","docs.baseurl.row3":"Daftar model yang tersedia beserta status ketersediaannya.","docs.baseurl.row4":"Ringkasan pemakaian token dan saldo untuk API key yang digunakan.","docs.baseurl.p2":"Base URL: https://api.conextrouter.id",
+"docs.models.title":"Model & Routing Otomatis","docs.models.p1":"Secara default, kirim \"model\": \"conext-auto\" dan ConextRouter akan menilai kompleksitas setiap request lalu mengarahkannya ke salah satu tier berikut. Kamu juga bisa memaksa model tertentu dengan mengirim nama modelnya langsung.","docs.models.col_tier":"Tier","docs.models.col_use":"Cocok untuk","docs.models.col_latency":"Latensi relatif","docs.models.row1":"Pertanyaan singkat, autocomplete, klasifikasi ringan","docs.models.row2":"Tugas harian dengan kompleksitas sedang","docs.models.row3":"Reasoning berat, analisis, dan tugas multi-langkah","docs.models.lat_low":"Rendah","docs.models.lat_mid":"Sedang","docs.models.lat_high":"Lebih tinggi","docs.models.p2":"Setiap respons menyertakan header x-conext-model yang menunjukkan model aktual yang menangani request, sehingga kamu tetap punya visibilitas penuh meski routing berjalan otomatis.",
+"docs.examples.title":"Contoh Kode","docs.examples.desc":"Pilih bahasa yang kamu pakai. Semua contoh menggunakan endpoint kompatibel OpenAI.",
+"docs.response.title":"Format Respons","docs.response.p1":"Respons mengikuti struktur standar Chat Completions, dengan tambahan field router yang menjelaskan keputusan routing.",
+"docs.streaming.title":"Streaming","docs.streaming.p1":"Tambahkan \"stream\": true pada body request untuk menerima respons secara bertahap lewat Server-Sent Events (SSE), berguna untuk menampilkan jawaban token demi token di UI kamu.",
+"docs.errors.title":"Penanganan Error","docs.errors.col_code":"Kode","docs.errors.col_meaning":"Arti","docs.errors.col_fix":"Yang perlu dilakukan","docs.errors.e401":"API key tidak valid atau hilang","docs.errors.f401":"Periksa header Authorization dan pastikan API key masih aktif","docs.errors.e402":"Saldo tidak mencukupi","docs.errors.f402":"Top up saldo dari dashboard","docs.errors.e429":"Rate limit terlampaui","docs.errors.f429":"Terapkan retry dengan backoff, lihat header rate limit","docs.errors.e400":"Body request tidak valid","docs.errors.f400":"Periksa format JSON dan field wajib","docs.errors.e500":"Kesalahan sisi server","docs.errors.f500":"Coba ulang, atau hubungi dukungan jika berlanjut",
+"docs.ratelimit.title":"Rate Limit","docs.ratelimit.p1":"Batas rate limit mengikuti limit yang kamu atur per API key di dashboard. Setiap respons menyertakan header berikut agar kamu bisa memantau sisa kuota secara real-time:","docs.ratelimit.p2":"Untuk kebutuhan throughput lebih tinggi, tim Enterprise dapat mengajukan penyesuaian limit sesuai kebutuhan.",
+"docs.pricing.title":"Harga & Penagihan","docs.pricing.p1":"Personal dikenakan biaya prabayar berdasarkan token yang terpakai, dipotong langsung dari saldo. Enterprise menggunakan skema postpaid dengan satu invoice bulanan untuk seluruh tim.","docs.pricing.p2":"Lihat rincian paket dan cara top up di halaman <a href=\"index.html#harga\" style=\"color:var(--accent);font-weight:600;\">Harga</a>.",
+"docs.support.title":"FAQ & Dukungan","docs.support.p1":"Pertanyaan umum seputar model, pembayaran, dan integrasi ada di halaman FAQ. Butuh bantuan lebih lanjut? Tim kami siap membantu.","docs.support.faq_title":"Baca FAQ","docs.support.faq_desc":"Jawaban singkat tentang model, harga, dan routing.","docs.support.faq_cta":"Buka FAQ","docs.support.contact_title":"Hubungi Tim","docs.support.contact_desc":"Untuk pertanyaan teknis atau kebutuhan Enterprise.","docs.support.contact_cta":"Ajukan Enterprise"
+},
+en: {
+"docs.badge":"Documentation","docs.h1":"Everything you need to start building","docs.lead":"A complete guide to authentication, endpoints, models, code examples, and error handling for integrating ConextRouter into your app.","docs.cta_quickstart":"Quickstart","docs.cta_auth":"View Authentication",
+"docs.toc.label":"On this page","docs.toc.quickstart":"Quickstart","docs.toc.auth":"Authentication","docs.toc.baseurl":"Base URL & Compatibility","docs.toc.models":"Models & Automatic Routing","docs.toc.examples":"Code Examples","docs.toc.response":"Response Format","docs.toc.streaming":"Streaming","docs.toc.errors":"Error Handling","docs.toc.ratelimit":"Rate Limits","docs.toc.pricing":"Pricing & Billing","docs.toc.support":"FAQ & Support",
+"docs.qs.title":"Quickstart","docs.qs.desc":"Three steps to send your first request to ConextRouter.","docs.qs.step1":"Create an account and verify your email in the dashboard.","docs.qs.step2":"Top up your balance, then create a new API key from the API Keys menu.","docs.qs.step3":"Point your SDK/code's base URL to api.conextrouter.id and use your API key as a Bearer token.",
+"docs.auth.title":"Authentication","docs.auth.p1":"Every request to ConextRouter must include your API key as a Bearer token in the Authorization header.","docs.auth.callout":"<strong>Keep your API key secret.</strong> Never embed it in client-side code (browser/mobile). Store it in a server-side environment variable, and create a separate API key for each environment (development, staging, production).","docs.auth.p2":"You can create multiple API keys from the dashboard, each with its own usage limit and label, and revoke any of them at any time without affecting the others.",
+"docs.baseurl.title":"Base URL & Compatibility","docs.baseurl.p1":"ConextRouter is compatible with the OpenAI and Anthropic request formats, so in most cases you only need to swap the base URL in the SDK you already use.","docs.baseurl.col_endpoint":"Endpoint","docs.baseurl.col_method":"Method","docs.baseurl.col_desc":"Description","docs.baseurl.row1":"OpenAI-compatible format, supports chat & tool calling.","docs.baseurl.row2":"Anthropic Messages API-compatible format.","docs.baseurl.row3":"List of available models and their availability status.","docs.baseurl.row4":"Token usage and balance summary for the API key in use.","docs.baseurl.p2":"Base URL: https://api.conextrouter.id",
+"docs.models.title":"Models & Automatic Routing","docs.models.p1":"By default, send \"model\": \"conext-auto\" and ConextRouter will evaluate each request's complexity and route it to one of the tiers below. You can also force a specific model by sending its name directly.","docs.models.col_tier":"Tier","docs.models.col_use":"Best for","docs.models.col_latency":"Relative latency","docs.models.row1":"Short questions, autocomplete, light classification","docs.models.row2":"Everyday tasks with medium complexity","docs.models.row3":"Heavy reasoning, analysis, and multi-step tasks","docs.models.lat_low":"Low","docs.models.lat_mid":"Medium","docs.models.lat_high":"Higher","docs.models.p2":"Every response includes an x-conext-model header showing the actual model that handled the request, so you keep full visibility even though routing is automatic.",
+"docs.examples.title":"Code Examples","docs.examples.desc":"Pick the language you use. All examples use the OpenAI-compatible endpoint.",
+"docs.response.title":"Response Format","docs.response.p1":"Responses follow the standard Chat Completions structure, with an added router field describing the routing decision.",
+"docs.streaming.title":"Streaming","docs.streaming.p1":"Add \"stream\": true to the request body to receive the response incrementally over Server-Sent Events (SSE) — useful for showing the answer token by token in your UI.",
+"docs.errors.title":"Error Handling","docs.errors.col_code":"Code","docs.errors.col_meaning":"Meaning","docs.errors.col_fix":"What to do","docs.errors.e401":"Invalid or missing API key","docs.errors.f401":"Check the Authorization header and make sure the API key is still active","docs.errors.e402":"Insufficient balance","docs.errors.f402":"Top up your balance from the dashboard","docs.errors.e429":"Rate limit exceeded","docs.errors.f429":"Implement retry with backoff, check the rate limit headers","docs.errors.e400":"Invalid request body","docs.errors.f400":"Check the JSON format and required fields","docs.errors.e500":"Server-side error","docs.errors.f500":"Retry, or contact support if it persists",
+"docs.ratelimit.title":"Rate Limits","docs.ratelimit.p1":"Rate limits follow whatever limit you set per API key in the dashboard. Every response includes the following headers so you can monitor your remaining quota in real time:","docs.ratelimit.p2":"For higher throughput needs, Enterprise teams can request a custom limit.",
+"docs.pricing.title":"Pricing & Billing","docs.pricing.p1":"Personal accounts are charged prepaid based on tokens used, deducted directly from your balance. Enterprise uses a postpaid plan with a single monthly invoice for the whole team.","docs.pricing.p2":"See plan details and how to top up on the <a href=\"index.html#harga\" style=\"color:var(--accent);font-weight:600;\">Pricing</a> page.",
+"docs.support.title":"FAQ & Support","docs.support.p1":"Common questions about models, payments, and integration are on the FAQ page. Need more help? Our team is ready to assist.","docs.support.faq_title":"Read the FAQ","docs.support.faq_desc":"Quick answers about models, pricing, and routing.","docs.support.faq_cta":"Open FAQ","docs.support.contact_title":"Contact the Team","docs.support.contact_desc":"For technical questions or Enterprise needs.","docs.support.contact_cta":"Talk to Enterprise Sales"
+},
+zh: {
+"docs.badge":"文档","docs.h1":"开始构建所需的一切","docs.lead":"关于身份验证、接口、模型、代码示例与错误处理的完整指南，帮助你将 ConextRouter 集成到应用中。","docs.cta_quickstart":"快速开始","docs.cta_auth":"查看身份验证",
+"docs.toc.label":"本页内容","docs.toc.quickstart":"快速开始","docs.toc.auth":"身份验证","docs.toc.baseurl":"Base URL 与兼容性","docs.toc.models":"模型与自动路由","docs.toc.examples":"代码示例","docs.toc.response":"响应格式","docs.toc.streaming":"流式响应","docs.toc.errors":"错误处理","docs.toc.ratelimit":"速率限制","docs.toc.pricing":"价格与结算","docs.toc.support":"常见问题与支持",
+"docs.qs.title":"快速开始","docs.qs.desc":"三步即可向 ConextRouter 发送你的第一个请求。","docs.qs.step1":"在控制台创建账户并验证邮箱。","docs.qs.step2":"充值余额，然后在 API 密钥菜单中创建新的 API 密钥。","docs.qs.step3":"将 SDK/代码中的 base URL 改为 api.conextrouter.id，并将 API 密钥作为 Bearer token 使用。",
+"docs.auth.title":"身份验证","docs.auth.p1":"每个发往 ConextRouter 的请求都需要在 Authorization 请求头中携带 API 密钥作为 Bearer token。","docs.auth.callout":"<strong>请妥善保管你的 API 密钥。</strong>切勿将其嵌入客户端代码（浏览器/移动端）。请将其保存在服务器端的环境变量中，并为每个环境（开发、预发布、生产）创建独立的 API 密钥。","docs.auth.p2":"你可以在控制台创建多个 API 密钥，各自设置独立的用量限额与标签，并可随时单独吊销，不影响其他密钥。",
+"docs.baseurl.title":"Base URL 与兼容性","docs.baseurl.p1":"ConextRouter 兼容 OpenAI 与 Anthropic 的请求格式，因此多数情况下你只需替换现有 SDK 中的 base URL 即可。","docs.baseurl.col_endpoint":"接口","docs.baseurl.col_method":"方法","docs.baseurl.col_desc":"说明","docs.baseurl.row1":"兼容 OpenAI 格式，支持对话与工具调用。","docs.baseurl.row2":"兼容 Anthropic Messages API 格式。","docs.baseurl.row3":"可用模型列表及其可用状态。","docs.baseurl.row4":"当前 API 密钥的 Token 用量与余额概览。","docs.baseurl.p2":"Base URL：https://api.conextrouter.id",
+"docs.models.title":"模型与自动路由","docs.models.p1":"默认情况下，发送 \"model\": \"conext-auto\"，ConextRouter 会评估每个请求的复杂度，并将其路由到以下某一档位；你也可以直接指定模型名称来强制使用特定模型。","docs.models.col_tier":"档位","docs.models.col_use":"适用场景","docs.models.col_latency":"相对延迟","docs.models.row1":"简短提问、自动补全、轻量分类","docs.models.row2":"中等复杂度的日常任务","docs.models.row3":"高强度推理、分析与多步骤任务","docs.models.lat_low":"较低","docs.models.lat_mid":"中等","docs.models.lat_high":"较高","docs.models.p2":"每个响应都会包含 x-conext-model 请求头，标明实际处理该请求的模型，即使采用自动路由，你依然拥有完整的可见性。",
+"docs.examples.title":"代码示例","docs.examples.desc":"选择你使用的语言。所有示例均使用兼容 OpenAI 的接口。",
+"docs.response.title":"响应格式","docs.response.p1":"响应遵循标准的 Chat Completions 结构，并新增 router 字段说明路由决策。",
+"docs.streaming.title":"流式响应","docs.streaming.p1":"在请求体中添加 \"stream\": true，即可通过 Server-Sent Events（SSE）分段接收响应，适合在界面中逐字展示回答。",
+"docs.errors.title":"错误处理","docs.errors.col_code":"状态码","docs.errors.col_meaning":"含义","docs.errors.col_fix":"处理方式","docs.errors.e401":"API 密钥无效或缺失","docs.errors.f401":"检查 Authorization 请求头，并确认该 API 密钥仍处于启用状态","docs.errors.e402":"余额不足","docs.errors.f402":"在控制台充值余额","docs.errors.e429":"超出速率限制","docs.errors.f429":"实施带退避的重试机制，并查看速率限制相关请求头","docs.errors.e400":"请求体格式无效","docs.errors.f400":"检查 JSON 格式及必填字段","docs.errors.e500":"服务器端错误","docs.errors.f500":"请重试，若问题持续请联系支持团队",
+"docs.ratelimit.title":"速率限制","docs.ratelimit.p1":"速率限制遵循你在控制台为每个 API 密钥设置的限额。每个响应都会包含以下请求头，方便你实时监控剩余额度：","docs.ratelimit.p2":"如需更高的吞吐量，企业版团队可申请调整限额。",
+"docs.pricing.title":"价格与结算","docs.pricing.p1":"个人版按实际使用的 Token 数量预付费，直接从余额中扣除；企业版采用后付费模式，整个团队每月结算为一张账单。","docs.pricing.p2":"在<a href=\"index.html#harga\" style=\"color:var(--accent);font-weight:600;\">价格</a>页面查看套餐详情与充值方式。",
+"docs.support.title":"常见问题与支持","docs.support.p1":"关于模型、支付与集成的常见问题可在 FAQ 页面找到。需要进一步帮助？我们的团队随时为你服务。","docs.support.faq_title":"查看常见问题","docs.support.faq_desc":"关于模型、价格与路由的简要解答。","docs.support.faq_cta":"打开 FAQ","docs.support.contact_title":"联系团队","docs.support.contact_desc":"如有技术问题或企业版需求，欢迎联系我们。","docs.support.contact_cta":"咨询企业版"
+}
+};
+for (var _lang in CR_I18N_DOCS){ for (var _k in CR_I18N_DOCS[_lang]){ CR_I18N[_lang][_k] = CR_I18N_DOCS[_lang][_k]; } }
+
+
+(function(){
+  var LANG_NAMES = { id: 'ID', en: 'EN', zh: '中文' };
+  var STORAGE_KEY = 'cr_lang';
+
+  function getLang(){
+    try{
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if(saved && CR_I18N[saved]) return saved;
+    }catch(e){}
+    return 'id';
+  }
+
+  function applyLang(lang){
+    if(!CR_I18N[lang]) lang = 'id';
+    var dict = CR_I18N[lang];
+    document.querySelectorAll('[data-i18n]').forEach(function(el){
+      var key = el.getAttribute('data-i18n');
+      if(dict[key] !== undefined) el.textContent = dict[key];
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(function(el){
+      var key = el.getAttribute('data-i18n-html');
+      if(dict[key] !== undefined) el.innerHTML = dict[key];
+    });
+    document.documentElement.setAttribute('lang', lang);
+    var btnLabel = document.getElementById('langBtnLabel');
+    if(btnLabel) btnLabel.textContent = LANG_NAMES[lang] || lang.toUpperCase();
+    document.querySelectorAll('.lang-menu button').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+    });
+    try{ localStorage.setItem(STORAGE_KEY, lang); }catch(e){}
+  }
+
+  function initSwitcher(){
+    var btn = document.getElementById('langBtn');
+    var menu = document.getElementById('langMenu');
+    if(!btn || !menu) return;
+    function closeMenu(){
+      menu.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+    function toggleMenu(){
+      var open = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      toggleMenu();
+    });
+    menu.querySelectorAll('button[data-lang]').forEach(function(b){
+      b.addEventListener('click', function(){
+        applyLang(b.getAttribute('data-lang'));
+        closeMenu();
+      });
+    });
+    document.addEventListener('click', function(e){
+      if(!menu.contains(e.target) && e.target !== btn) closeMenu();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') closeMenu();
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    initSwitcher();
+    applyLang(getLang());
+  });
+})();
+
+
+(function(){
+  // code tabs
+  document.querySelectorAll('.code-tabs').forEach(function(tabs){
+    var wrap = tabs.nextElementSibling;
+    tabs.querySelectorAll('.code-tab-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        tabs.querySelectorAll('.code-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        var target = btn.getAttribute('data-tab');
+        wrap.querySelectorAll('.code-panel').forEach(function(p){
+          p.classList.toggle('active', p.getAttribute('data-panel') === target);
+        });
+      });
+    });
+  });
+
+  // TOC scroll-spy
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll('#docsToc a'));
+  var sections = tocLinks.map(function(a){ return document.querySelector(a.getAttribute('href')); }).filter(Boolean);
+  if('IntersectionObserver' in window && sections.length){
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        var id = '#' + entry.target.id;
+        var link = tocLinks.filter(function(a){ return a.getAttribute('href') === id; })[0];
+        if(entry.isIntersecting && link){
+          tocLinks.forEach(function(a){ a.classList.remove('active'); });
+          link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+    sections.forEach(function(s){ io.observe(s); });
+  }
+})();
+
+</script>
+</body>
+</html>
